@@ -1,89 +1,68 @@
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import QRCode from 'react-native-qrcode-svg';
-import styles from '../styles/';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { StatusBar } from 'react-native'; // Barre d'état pour le thème sombre
+import LoginScreen from './src/screens/Auth/LoginScreen';
+import RegisterScreen from './src/screens/Auth/RegisterScreen';
+import MainTabNavigator from './src/navigation/MainTabNavigator'; // Navigation principale avec onglets
+import EventDetailsScreen from './src/screens/EventDetailsScreen'; // Écran des détails d'un événement
+import ReservationScreen from './src/screens/ReservationScreen'; // Écran de réservation
+import TicketsQRCodeScreen from './src/screens/TicketsQrCodeScreen'; // Écran du QR code des tickets
+
+const Stack = createStackNavigator();
 
 /**
- * Écran TicketsQRCodeScreen.
- * - Affiche les détails de la réservation et le QR code.
+ * Composant principal de l'application.
+ * - Configure la navigation principale.
+ * - Définit les écrans de connexion, d'inscription, de navigation principale et de détails d'événement.
  */
-const TicketsQRCodeScreen = ({ route }) => {
-  const navigation = useNavigation();
-  const { reservation } = route.params;
-
-  useEffect(() => {
-    if (!reservation) {
-      Alert.alert('Erreur', 'Aucune réservation trouvée.');
-      navigation.goBack();
-    } else {
-      console.log('Reservation:', reservation);
-    }
-  }, [reservation, navigation]);
-
-  if (!reservation) {
-    return null;
-  }
-
-  const eventDate = reservation.events.start_date
-    ? new Date(reservation.events.start_date)
-    : null;
-
-  // URL de la page web avec l'ID de la réservation en paramètre
-  const qrCodeUrl = `https://kierha.github.io/tickets_details/index.html?id=${reservation.id}`;
-
+export default function App() {
   return (
-    <View style={styles.container}>
-      {/* En-tête */}
-      <Text style={styles.header}>Your E-Ticket</Text>
-
-      {/* QR Code */}
-      <View style={styles.qrContainer}>
-        <QRCode
-          value={qrCodeUrl}
-          size={200}
-          backgroundColor="#FFFFFF"
-          color="#000000"
-        />
-      </View>
-
-      {/* Carte d'informations */}
-      <View style={styles.ticketCard}>
-        <Text style={styles.eventTitle}>{reservation.event_title}</Text>
-
-        <View style={styles.infoRow}>
-          <View style={styles.infoColumn}>
-            <Text style={styles.infoLabel}>Date</Text>
-            <Text style={styles.infoValue}>
-              {eventDate
-                ? eventDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                : 'N/A'}
-            </Text>
-          </View>
-          <View style={styles.infoColumn}>
-            <Text style={styles.infoLabel}>Time</Text>
-            <Text style={styles.infoValue}>
-              {eventDate
-                ? eventDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-                : 'N/A'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.infoRow}>
-          <View style={styles.infoColumn}>
-            <Text style={styles.infoLabel}>Location</Text>
-            <Text style={styles.infoValue}>{reservation.events.location}</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Bouton Retour */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backButtonText}>Back to Tickets</Text>
-      </TouchableOpacity>
-    </View>
+    <>
+      {/* Barre d'état avec un style adapté au thème sombre */}
+      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+          {/* Écrans d'authentification */}
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          {/* Navigation principale */}
+          <Stack.Screen name="Main" component={MainTabNavigator} />
+          {/* Détails d'un événement */}
+          <Stack.Screen
+            name="EventDetails"
+            component={EventDetailsScreen}
+            options={{
+              headerShown: true,
+              headerStyle: { backgroundColor: '#000' },
+              headerTintColor: '#FFF',
+              title: 'Event Details',
+            }}
+          />
+          {/* Écran de réservation */}
+          <Stack.Screen
+            name="Reservation"
+            component={ReservationScreen}
+            options={{
+              headerShown: true,
+              headerStyle: { backgroundColor: '#000' },
+              headerTintColor: '#FFF',
+              title: 'Reservation',
+            }}
+          />
+          {/* Écran du QR code des tickets */}
+          <Stack.Screen
+            name="TicketsQRCode"
+            component={TicketsQRCodeScreen}
+            options={{
+              headerShown: true,
+              headerStyle: { backgroundColor: '#000' },
+              headerTintColor: '#FFF',
+              title: 'Tickets QR Code',
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
-};
-
-export default TicketsQRCodeScreen;
+}
