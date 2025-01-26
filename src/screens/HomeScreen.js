@@ -16,7 +16,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import styles from "../styles/HomeScreenStyle";
 
 const HomeScreen = ({ navigation }) => {
-  const { trendingEvents, upcomingEvents, loading } = useEvents();
+  const { allEvents, trendingEvents, upcomingEvents, loading } = useEvents();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -41,7 +41,7 @@ const HomeScreen = ({ navigation }) => {
 
   // Filtrer les événements en fonction de la recherche et de la catégorie
   const filterEvents = (query, category) => {
-    let filtered = [...trendingEvents, ...upcomingEvents];
+    let filtered = [...allEvents];
 
     if (query) {
       filtered = filtered.filter((event) =>

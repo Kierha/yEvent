@@ -61,15 +61,21 @@ export const createReservation = async (
       { returning: "minimal" } // Ne retourne pas automatiquement les données
     );
 
-    // console.log("Data returned by Supabase:", data);
-    // console.log("Error returned by Supabase:", error);
-
     if (error) throw new Error(error.message);
 
     // Vérifie manuellement si la réservation a bien été ajoutée
     const { data: insertedReservation, error: fetchError } = await supabase
       .from("reservations")
-      .select("*")
+      .select(
+        `
+        *,
+        events!inner (
+          image,
+          start_date,
+          location
+        )
+      `
+      )
       .eq("user_id", userId)
       .eq("event_id", eventId)
       .order("reservation_date", { ascending: false })

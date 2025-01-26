@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, Alert } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, Alert } from "react-native";
 import { getUserDetails } from "../api/AuthService";
 import { useReservations } from "../hooks/UseReservations";
 import TicketCard from "../components/TicketCard";
@@ -33,10 +33,21 @@ const MyTicketsScreen = () => {
     }
   }, [userId]);
 
+  const now = new Date();
+
+  const upcomingReservations = reservations.filter(
+    (reservation) => new Date(reservation.events.start_date) >= now
+  );
+
+  const pastReservations = reservations.filter(
+    (reservation) => new Date(reservation.events.start_date) < now
+  );
+
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <Text style={styles.infoText}>Loading tickets...</Text>
+        <ActivityIndicator size="large" color="#4CAF50" />
+        <Text style={styles.loadingText}>Loading tickets...</Text>
       </View>
     );
   }
@@ -52,9 +63,24 @@ const MyTicketsScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>My Tickets</Text>
-      {reservations.map((reservation) => (
-        <TicketCard key={reservation.id} reservation={reservation} />
-      ))}
+
+      <Text style={styles.sectionTitle}>Upcoming Events</Text>
+      {upcomingReservations.length > 0 ? (
+        upcomingReservations.map((reservation) => (
+          <TicketCard key={reservation.id} reservation={reservation} />
+        ))
+      ) : (
+        <Text style={styles.infoText}>No upcoming events.</Text>
+      )}
+
+      <Text style={styles.sectionTitle}>Past Events</Text>
+      {pastReservations.length > 0 ? (
+        pastReservations.map((reservation) => (
+          <TicketCard key={reservation.id} reservation={reservation} />
+        ))
+      ) : (
+        <Text style={styles.infoText}>No past events.</Text>
+      )}
     </ScrollView>
   );
 };

@@ -1,7 +1,15 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import styles from '../styles/EventDetailsStyle';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { useEvents } from "../hooks/UseEvents";
+import styles from "../styles/EventDetailsStyle";
 
 /**
  * Page des détails d'un événement.
@@ -10,6 +18,27 @@ import styles from '../styles/EventDetailsStyle';
  */
 const EventDetailsScreen = ({ route, navigation }) => {
   const { event } = route.params; // Données de l'événement passées en paramètres
+  const { checkAvailability } = useEvents();
+  const [isSoldOut, setIsSoldOut] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      const available = await checkAvailability(event.id);
+      setIsSoldOut(!available);
+      setLoading(false);
+    };
+
+    fetchAvailability();
+  }, [event.id, checkAvailability]);
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#4CAF50" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -56,9 +85,6 @@ const EventDetailsScreen = ({ route, navigation }) => {
             style={styles.icon}
           />
           <Text style={styles.infoText}>{event.location}</Text>
-          <TouchableOpacity>
-            <Text style={styles.directionLink}>Direction</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Détails */}
@@ -67,10 +93,15 @@ const EventDetailsScreen = ({ route, navigation }) => {
 
         {/* Bouton d'achat */}
         <TouchableOpacity
-          style={styles.buyButton}
-          onPress={() => navigation.navigate("Reservation", { event })} // Passez les détails de l'événement
+          style={[styles.buyButton, isSoldOut && styles.soldOutButton]}
+          onPress={() =>
+            !isSoldOut && navigation.navigate("Reservation", { event })
+          } // Passez les détails de l'événement
+          disabled={isSoldOut}
         >
-          <Text style={styles.buyButtonText}>Buy Tickets</Text>
+          <Text style={styles.buyButtonText}>
+            {isSoldOut ? "Full" : "Buy Tickets"}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

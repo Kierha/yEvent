@@ -1,21 +1,20 @@
 import { useState, useEffect } from "react";
+import { supabase } from "../api/Supabase";
 import {
-  createReservation,
   getUserReservations,
-  deleteReservation,
-  updateEventFromReservation,
+  createReservation,
 } from "../api/ReservationService";
 
 /**
  * Hook personnalisé pour gérer les réservations.
- * @param {string} userId - ID de l'utilisateur.
+ * - Permet de créer une réservation.
+ * - Permet de récupérer les réservations d'un utilisateur.
  */
 export const useReservations = (userId) => {
   const [reservations, setReservations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Charge les réservations à l'initialisation
   useEffect(() => {
     if (userId) {
       fetchReservations();
@@ -26,7 +25,11 @@ export const useReservations = (userId) => {
     try {
       setLoading(true);
       const data = await getUserReservations(userId);
-      setReservations(data);
+      // Trier les réservations par date de réservation dans l'ordre décroissant
+      const sortedData = data.sort(
+        (a, b) => new Date(b.reservation_date) - new Date(a.reservation_date)
+      );
+      setReservations(sortedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -35,46 +38,41 @@ export const useReservations = (userId) => {
   };
 
   const addReservation = async (eventId, eventTitle, ticketsCount) => {
+    setLoading(true);
+    setError(null);
+
     try {
-      // console.log("Adding reservation:", {
-      //   userId,
-      //   eventId,
-      //   eventTitle,
-      //   ticketsCount,
-      // });
       const newReservation = await createReservation(
         userId,
         eventId,
         eventTitle,
         ticketsCount
       );
-      setReservations((prev) => [...prev, newReservation]);
 
-      // Mettre à jour l'événement après avoir ajouté la réservation
-      await updateEventFromReservation(eventId, ticketsCount);
-      // console.log("Event updated after reservation");
+      if (!newReservation) {
+        throw new Error("Aucune réservation trouvée");
+      }
+
+      setReservations((prevReservations) => [
+        newReservation,
+        ...prevReservations,
+      ]);
+
+      return newReservation;
     } catch (err) {
       setError(err.message);
       console.error("Error adding reservation:", err);
-    }
-  };
-
-  const removeReservation = async (reservationId) => {
-    try {
-      await deleteReservation(reservationId);
-      setReservations((prev) => prev.filter((res) => res.id !== reservationId));
-    } catch (err) {
-      setError(err.message);
-      console.error("Error deleting reservation:", err);
+      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
   return {
     reservations,
+    addReservation,
+    fetchReservations,
     loading,
     error,
-    fetchReservations,
-    addReservation,
-    removeReservation,
   };
 };

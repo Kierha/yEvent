@@ -16,14 +16,21 @@ const TicketsQRCodeScreen = ({ route }) => {
     if (!reservation) {
       Alert.alert("Erreur", "Aucune réservation trouvée.");
       navigation.goBack();
-    } else {
-      // console.log('Reservation:', reservation);
-      // console.log('QR Code:', reservation.qr_code);
     }
   }, [reservation, navigation]);
 
-  if (!reservation) {
-    return null;
+  if (!reservation || !reservation.events) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Aucune réservation trouvée.</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate("Main", { screen: "Tickets" })}
+        >
+          <Text style={styles.backButtonText}>Retour</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
 
   const eventDate = reservation.events.start_date
@@ -94,7 +101,7 @@ const TicketsQRCodeScreen = ({ route }) => {
       {/* Bouton Retour collé en bas */}
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => navigation.goBack()}
+        onPress={() => navigation.navigate("Main", { screen: "Tickets" })}
       >
         <Text style={styles.backButtonText}>Back to Tickets</Text>
       </TouchableOpacity>

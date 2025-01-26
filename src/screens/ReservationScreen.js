@@ -13,6 +13,9 @@ const ReservationScreen = ({ route, navigation }) => {
   const [userId, setUserId] = useState(null); // État pour l'ID de l'utilisateur
   const { addReservation } = useReservations(userId); // Passe l'ID de l'utilisateur au hook
   const [ticketsCount, setTicketsCount] = useState(1); // État pour le nombre de tickets
+  const [remainingTickets, setRemainingTickets] = useState(
+    event.capacity - event.tickets_sold
+  ); // État pour les tickets restants
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -34,10 +37,17 @@ const ReservationScreen = ({ route, navigation }) => {
   // Fonction pour gérer la réservation
   const handleReservation = async () => {
     try {
-      // console.log("Handling reservation for event:", event);
-      await addReservation(event.id, event.title, ticketsCount);
-      Alert.alert("Succès", "Votre réservation a été confirmée !");
-      navigation.navigate("Main"); // Retour à l'accueil
+      const reservation = await addReservation(
+        event.id,
+        event.title,
+        ticketsCount
+      );
+      if (reservation) {
+        Alert.alert("Succès", "Votre réservation a été confirmée !");
+        navigation.navigate("TicketsQRCode", { reservation }); // Redirige vers l'écran des détails de la réservation avec le QR code
+      } else {
+        throw new Error("Aucune réservation trouvée");
+      }
     } catch (error) {
       console.error("Error during reservation:", error);
       Alert.alert("Erreur", error.message);
@@ -62,12 +72,25 @@ const ReservationScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <Text style={styles.ticketCount}>{ticketsCount}</Text>
         <TouchableOpacity
-          style={styles.ticketButton}
-          onPress={() => setTicketsCount((prev) => prev + 1)}
+          style={[
+            styles.ticketButton,
+            ticketsCount >= remainingTickets && styles.disabledButton,
+          ]}
+          onPress={() =>
+            setTicketsCount((prev) => Math.min(prev + 1, remainingTickets))
+          }
+          disabled={ticketsCount >= remainingTickets}
         >
           <Text style={styles.ticketButtonText}>+</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Message indiquant le nombre de tickets restants */}
+      {ticketsCount >= remainingTickets && (
+        <Text style={styles.remainingTicketsText}>
+          Il ne reste que {remainingTickets} tickets disponibles.
+        </Text>
+      )}
 
       {/* Bouton de réservation */}
       <TouchableOpacity

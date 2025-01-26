@@ -5,13 +5,14 @@ import { enUS } from "date-fns/locale";
 
 /**
  * Hook personnalisé pour récupérer les événements.
- * - Récupère les événements "Trending", "Upcoming", et "Nearby".
+ * - Récupère les événements "Trending", "Upcoming", "Nearby", et "All".
  * - Gère les états de chargement et les erreurs.
  */
 export const useEvents = (userLocation) => {
   const [trendingEvents, setTrendingEvents] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [nearbyEvents, setNearbyEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -23,6 +24,11 @@ export const useEvents = (userLocation) => {
     try {
       setLoading(true);
       setError(null);
+
+      // All Events
+      const { data: all, error: allError } = await supabase
+        .from("events")
+        .select("*");
 
       // Trending Events
       const { data: trending, error: trendingError } = await supabase
@@ -67,8 +73,8 @@ export const useEvents = (userLocation) => {
         });
       }
 
-      if (trendingError || upcomingError) {
-        throw trendingError || upcomingError;
+      if (allError || trendingError || upcomingError) {
+        throw allError || trendingError || upcomingError;
       }
 
       // Function to capitalize the first letter
@@ -77,6 +83,15 @@ export const useEvents = (userLocation) => {
       };
 
       // Format the dates
+      const formattedAll = all.map((event) => ({
+        ...event,
+        start_date: capitalizeFirstLetter(
+          format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", {
+            locale: enUS,
+          })
+        ),
+      }));
+
       const formattedTrending = trending.map((event) => ({
         ...event,
         start_date: capitalizeFirstLetter(
@@ -104,6 +119,7 @@ export const useEvents = (userLocation) => {
         ),
       }));
 
+      setAllEvents(formattedAll);
       setTrendingEvents(formattedTrending);
       setUpcomingEvents(formattedUpcoming);
       setNearbyEvents(formattedNearby);
@@ -135,5 +151,36 @@ export const useEvents = (userLocation) => {
     return deg * (Math.PI / 180);
   };
 
-  return { trendingEvents, upcomingEvents, nearbyEvents, loading, error };
+  // Fonction pour vérifier la disponibilité des places pour un événement spécifique
+  const checkAvailability = async (eventId) => {
+    try {
+      const { data, error } = await supabase
+        .from("events")
+        .select("tickets_sold, capacity")
+        .eq("id", eventId)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return data.tickets_sold < data.capacity;
+    } catch (err) {
+      console.error(
+        "Erreur lors de la vérification de la disponibilité :",
+        err
+      );
+      return false;
+    }
+  };
+
+  return {
+    allEvents,
+    trendingEvents,
+    upcomingEvents,
+    nearbyEvents,
+    loading,
+    error,
+    checkAvailability,
+  };
 };

@@ -1,23 +1,30 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     padding: 20,
   },
   title: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
+  sectionTitle: {
+    color: "#4CAF50",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 10,
+  },
   ticketCard: {
-    flexDirection: 'row',
-    backgroundColor: '#1E1E1E',
+    flexDirection: "row",
+    backgroundColor: "#1E1E1E",
     borderRadius: 10,
     marginBottom: 15,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   eventImage: {
     width: 100,
@@ -34,29 +41,41 @@ export default StyleSheet.create({
   ticketInfo: {
     flex: 1,
     padding: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   eventTitle: {
-    color: '#4CAF50',
+    color: "#4CAF50",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 5,
   },
   text: {
-    color: '#FFF',
+    color: "#FFF",
     marginBottom: 3,
   },
   dateText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   infoText: {
-    color: '#AAA',
-    textAlign: 'center',
+    color: "#AAA",
+    textAlign: "center",
   },
   errorText: {
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000",
+  },
+  loadingText: {
+    color: "#4CAF50",
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 10,
   },
 });
