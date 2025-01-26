@@ -58,7 +58,7 @@ export const createReservation = async (
         reservation_date: reservationDate,
         qr_code: qrCodeBase64,
       },
-      { returning: "minimal" } // Ne retourne pas automatiquement les données
+      { returning: "minimal" } // Retourne uniquement l'ID de la réservation
     );
 
     if (error) throw new Error(error.message);

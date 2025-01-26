@@ -7,6 +7,12 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  /**
+   * handleLogin
+   * - Gère la connexion de l'utilisateur.
+   * - Affiche un message d'erreur en cas d'échec.
+   * - Redirige vers l'écran principal en cas de succès.
+   */
   const handleLogin = async () => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -14,15 +20,13 @@ const LoginScreen = ({ navigation }) => {
         password,
       });
       if (error) {
-        Alert.alert("Erreur", error.message);
+        Alert.alert("Error", error.message);
       } else {
-        // Alert.alert('Succès', 'Connexion réussie !');
-        // console.log('Redirection vers Home après connexion');
-        navigation.replace("Main"); // Redirige vers l'écran Home
+        navigation.replace("Main");
       }
     } catch (err) {
       console.error(err);
-      Alert.alert("Erreur inattendue", "Une erreur est survenue.");
+      Alert.alert("Unexpected Error", "An error occurred.");
     }
   };
 

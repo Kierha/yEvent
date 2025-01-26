@@ -4,16 +4,16 @@
  * pour créer l'utilisateur dans Supabase Auth et dans la table `users`.
  */
 
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { signUp } from '../../api/AuthService';          // <-- On importe la fonction signUp
-import styles from '../../styles/RegisterScreenStyle';    // <-- Tes styles externalisés
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { signUp } from "../../api/AuthService"; // <-- On importe la fonction signUp
+import styles from "../../styles/RegisterScreenStyle"; // <-- Tes styles externalisés
 
 const RegisterScreen = ({ navigation }) => {
   // Champs gérés par l'utilisateur
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   /**
    * handleRegister
@@ -25,20 +25,20 @@ const RegisterScreen = ({ navigation }) => {
     try {
       // 1. Inscription via AuthService (Auth + insert dans `users`)
       const user = await signUp(email, password, name);
-      
+
       // 2. Vérifie si l'utilisateur a bien été créé
       if (user) {
         Alert.alert(
-          'Succès',
-          'Inscription réussie ! Vérifie ta boîte e-mail pour valider ton compte.'
+          "Succès",
+          "Inscription réussie ! Vérifie ta boîte e-mail pour valider ton compte."
         );
         // 3. Redirige vers la page de login
-        navigation.navigate('Login');
+        navigation.navigate("Login");
       }
     } catch (error) {
       // 4. Gère les erreurs
-      console.error('Erreur lors de l’inscription :', error);
-      Alert.alert('Erreur', error.message || 'Une erreur est survenue.');
+      console.error("Erreur lors de l’inscription :", error);
+      Alert.alert("Erreur", error.message || "Une erreur est survenue.");
     }
   };
 
@@ -78,7 +78,7 @@ const RegisterScreen = ({ navigation }) => {
 
       <View style={styles.loginContainer}>
         <Text style={styles.loginText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.loginLink}>Sign In</Text>
         </TouchableOpacity>
       </View>
