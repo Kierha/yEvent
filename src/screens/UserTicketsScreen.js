@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Alert } from 'react-native';
-import { getUserDetails } from '../api/AuthService';
-import { useReservations } from '../hooks/UseReservations';
-import TicketCard from '../components/TicketCard';
-import styles from '../styles/UserTicketsScreenStyle';
+import React, { useState, useEffect } from "react";
+import { View, Text, ScrollView, Alert } from "react-native";
+import { getUserDetails } from "../api/AuthService";
+import { useReservations } from "../hooks/UseReservations";
+import TicketCard from "../components/TicketCard";
+import styles from "../styles/UserTicketsScreenStyle";
 
 /**
  * Écran MyTicketsScreen.
@@ -12,7 +12,8 @@ import styles from '../styles/UserTicketsScreenStyle';
  */
 const MyTicketsScreen = () => {
   const [userId, setUserId] = useState(null);
-  const { reservations, loading, error } = useReservations(userId);
+  const { reservations, loading, error, fetchReservations } =
+    useReservations(userId);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -20,11 +21,17 @@ const MyTicketsScreen = () => {
         const user = await getUserDetails();
         setUserId(user.id);
       } catch (err) {
-        Alert.alert('Error', 'Unable to retrieve user info.');
+        Alert.alert("Error", "Unable to retrieve user info.");
       }
     };
     fetchUserId();
   }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchReservations();
+    }
+  }, [userId]);
 
   if (loading) {
     return (

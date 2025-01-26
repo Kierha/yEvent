@@ -1,5 +1,10 @@
-import { useState, useEffect } from 'react';
-import { createReservation, getUserReservations, deleteReservation, updateEventFromReservation } from '../api/ReservationService';
+import { useState, useEffect } from "react";
+import {
+  createReservation,
+  getUserReservations,
+  deleteReservation,
+  updateEventFromReservation,
+} from "../api/ReservationService";
 
 /**
  * Hook personnalisé pour gérer les réservations.
@@ -31,16 +36,26 @@ export const useReservations = (userId) => {
 
   const addReservation = async (eventId, eventTitle, ticketsCount) => {
     try {
-      console.log('Adding reservation:', { userId, eventId, eventTitle, ticketsCount });
-      const newReservation = await createReservation(userId, eventId, eventTitle, ticketsCount);
+      console.log("Adding reservation:", {
+        userId,
+        eventId,
+        eventTitle,
+        ticketsCount,
+      });
+      const newReservation = await createReservation(
+        userId,
+        eventId,
+        eventTitle,
+        ticketsCount
+      );
       setReservations((prev) => [...prev, newReservation]);
 
       // Mettre à jour l'événement après avoir ajouté la réservation
       await updateEventFromReservation(eventId, ticketsCount);
-      console.log('Event updated after reservation');
+      console.log("Event updated after reservation");
     } catch (err) {
       setError(err.message);
-      console.error('Error adding reservation:', err);
+      console.error("Error adding reservation:", err);
     }
   };
 
@@ -50,7 +65,7 @@ export const useReservations = (userId) => {
       setReservations((prev) => prev.filter((res) => res.id !== reservationId));
     } catch (err) {
       setError(err.message);
-      console.error('Error deleting reservation:', err);
+      console.error("Error deleting reservation:", err);
     }
   };
 

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { useReservations } from '../hooks/UseReservations'; // Import du hook
-import { getUserDetails } from '../api/AuthService'; // Import de la fonction getUserDetails
-import styles from '../styles/ReservationScreenStyle'; // Fichier de styles
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { useReservations } from "../hooks/UseReservations"; // Import du hook
+import { getUserDetails } from "../api/AuthService"; // Import de la fonction getUserDetails
+import styles from "../styles/ReservationScreenStyle"; // Fichier de styles
 
 /**
  * Écran de réservation d'événement.
@@ -20,8 +20,11 @@ const ReservationScreen = ({ route, navigation }) => {
         const user = await getUserDetails();
         setUserId(user.id);
       } catch (error) {
-        console.error('Error fetching user details:', error);
-        Alert.alert('Erreur', 'Impossible de récupérer les informations utilisateur.');
+        console.error("Error fetching user details:", error);
+        Alert.alert(
+          "Erreur",
+          "Impossible de récupérer les informations utilisateur."
+        );
       }
     };
 
@@ -31,13 +34,13 @@ const ReservationScreen = ({ route, navigation }) => {
   // Fonction pour gérer la réservation
   const handleReservation = async () => {
     try {
-      console.log('Handling reservation for event:', event);
+      console.log("Handling reservation for event:", event);
       await addReservation(event.id, event.title, ticketsCount);
-      Alert.alert('Succès', 'Votre réservation a été confirmée !');
-      navigation.navigate('Main'); // Retour à l'accueil
+      Alert.alert("Succès", "Votre réservation a été confirmée !");
+      navigation.navigate("Main"); // Retour à l'accueil
     } catch (error) {
-      console.error('Error during reservation:', error);
-      Alert.alert('Erreur', error.message);
+      console.error("Error during reservation:", error);
+      Alert.alert("Erreur", error.message);
     }
   };
 
@@ -45,7 +48,9 @@ const ReservationScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       {/* Informations de l'événement */}
       <Text style={styles.title}>{event.title}</Text>
-      <Text style={styles.price}>{event.price === 0 ? 'Gratuit' : `$${event.price} par ticket`}</Text>
+      <Text style={styles.price}>
+        {event.price === 0 ? "Gratuit" : `$${event.price} par ticket`}
+      </Text>
 
       {/* Sélecteur de tickets */}
       <View style={styles.ticketSelector}>
@@ -65,7 +70,10 @@ const ReservationScreen = ({ route, navigation }) => {
       </View>
 
       {/* Bouton de réservation */}
-      <TouchableOpacity style={styles.reserveButton} onPress={handleReservation}>
+      <TouchableOpacity
+        style={styles.reserveButton}
+        onPress={handleReservation}
+      >
         <Text style={styles.reserveButtonText}>Réserver</Text>
       </TouchableOpacity>
     </View>

@@ -1,13 +1,13 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { StatusBar } from 'react-native'; // Barre d'état pour le thème sombre
-import LoginScreen from './src/screens/Auth/LoginScreen';
-import RegisterScreen from './src/screens/Auth/RegisterScreen';
-import MainTabNavigator from './src/navigation/MainTabNavigator'; // Navigation principale avec onglets
-import EventDetailsScreen from './src/screens/EventDetailsScreen'; // Écran des détails d'un événement
-import ReservationScreen from './src/screens/ReservationScreen'; // Écran de réservation
-import TicketsQRCodeScreen from './src/screens/TicketsQrCodeScreen'; // Écran du QR code des tickets
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { StatusBar } from "react-native"; // Barre d'état pour le thème sombre
+import LoginScreen from "./src/screens/Auth/LoginScreen";
+import RegisterScreen from "./src/screens/Auth/RegisterScreen";
+import MainTabNavigator from "./src/navigation/MainTabNavigator"; // Navigation principale avec onglets
+import EventDetailsScreen from "./src/screens/EventDetailsScreen"; // Écran des détails d'un événement
+import ReservationScreen from "./src/screens/ReservationScreen"; // Écran de réservation
+import TicketsQRCodeScreen from "./src/screens/TicketsQrCodeScreen"; // Écran du QR code des tickets
 
 const Stack = createStackNavigator();
 
@@ -22,7 +22,10 @@ export default function App() {
       {/* Barre d'état avec un style adapté au thème sombre */}
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          initialRouteName="Login"
+          screenOptions={{ headerShown: false }}
+        >
           {/* Écrans d'authentification */}
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
@@ -33,10 +36,10 @@ export default function App() {
             name="EventDetails"
             component={EventDetailsScreen}
             options={{
-              headerShown: true,
-              headerStyle: { backgroundColor: '#000' },
-              headerTintColor: '#FFF',
-              title: 'Event Details',
+              headerShown: false,
+              headerStyle: { backgroundColor: "#000" },
+              headerTintColor: "#FFF",
+              title: "Event Details",
             }}
           />
           {/* Écran de réservation */}
@@ -45,9 +48,9 @@ export default function App() {
             component={ReservationScreen}
             options={{
               headerShown: true,
-              headerStyle: { backgroundColor: '#000' },
-              headerTintColor: '#FFF',
-              title: 'Reservation',
+              headerStyle: { backgroundColor: "#000" },
+              headerTintColor: "#FFF",
+              title: "Reservation",
             }}
           />
           {/* Écran du QR code des tickets */}
@@ -55,10 +58,7 @@ export default function App() {
             name="TicketsQRCode"
             component={TicketsQRCodeScreen}
             options={{
-              headerShown: true,
-              headerStyle: { backgroundColor: '#000' },
-              headerTintColor: '#FFF',
-              title: 'Tickets QR Code',
+              headerShown: false,
             }}
           />
         </Stack.Navigator>
