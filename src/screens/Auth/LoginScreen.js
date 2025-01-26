@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { supabase } from '../../api/Supabase.js'; 
-import styles from '../../styles/LoginScreenStyle.js'; 
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { supabase } from "../../api/Supabase.js";
+import styles from "../../styles/LoginScreenStyle.js";
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
@@ -14,15 +14,15 @@ const LoginScreen = ({ navigation }) => {
         password,
       });
       if (error) {
-        Alert.alert('Erreur', error.message);
+        Alert.alert("Erreur", error.message);
       } else {
-        Alert.alert('Succès', 'Connexion réussie !');
-        console.log('Redirection vers Home après connexion');
-        navigation.replace('Main'); // Redirige vers l'écran Home
+        // Alert.alert('Succès', 'Connexion réussie !');
+        // console.log('Redirection vers Home après connexion');
+        navigation.replace("Main"); // Redirige vers l'écran Home
       }
     } catch (err) {
       console.error(err);
-      Alert.alert('Erreur inattendue', 'Une erreur est survenue.');
+      Alert.alert("Erreur inattendue", "Une erreur est survenue.");
     }
   };
 
@@ -57,7 +57,7 @@ const LoginScreen = ({ navigation }) => {
 
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.registerLink}>Register here</Text>
         </TouchableOpacity>
       </View>

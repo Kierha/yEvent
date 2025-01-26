@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import QRCode from 'react-native-qrcode-svg';
-import styles from '../styles/TicketsQrCodeScreenStyle';
+import React, { useEffect } from "react";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import QRCode from "react-native-qrcode-svg";
+import styles from "../styles/TicketsQrCodeScreenStyle";
 
 /**
  * Écran TicketsQRCodeScreen.
@@ -14,11 +14,11 @@ const TicketsQRCodeScreen = ({ route }) => {
 
   useEffect(() => {
     if (!reservation) {
-      Alert.alert('Erreur', 'Aucune réservation trouvée.');
+      Alert.alert("Erreur", "Aucune réservation trouvée.");
       navigation.goBack();
     } else {
-      console.log('Reservation:', reservation);
-      console.log('QR Code:', reservation.qr_code);
+      // console.log('Reservation:', reservation);
+      // console.log('QR Code:', reservation.qr_code);
     }
   }, [reservation, navigation]);
 
@@ -32,8 +32,10 @@ const TicketsQRCodeScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      {/* En-tête */}
-      <Text style={styles.header}>Your E-Ticket</Text>
+      {/* Affichage de l'UUID tronqué */}
+      <Text style={styles.header}>
+        Order ID: {reservation.id.substring(0, 8)}
+      </Text>
 
       {/* Carte globale de ticket */}
       <View style={styles.ticketCard}>
@@ -41,9 +43,9 @@ const TicketsQRCodeScreen = ({ route }) => {
         {reservation.id ? (
           <QRCode
             value={reservation.id.toString()}
-            size={200}               // QR code plus grand
+            size={200} // QR code plus grand
             backgroundColor="#FFFFFF"
-            style={styles.qrImage}   // Centré
+            style={styles.qrImage} // Centré
           />
         ) : (
           <Text style={styles.errorText}>QR Code non disponible</Text>
@@ -60,23 +62,23 @@ const TicketsQRCodeScreen = ({ route }) => {
             <Text style={styles.infoLabel}>Date</Text>
             <Text style={styles.infoValue}>
               {eventDate
-                ? eventDate.toLocaleDateString('en-GB', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
+                ? eventDate.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
                   })
-                : 'N/A'}
+                : "N/A"}
             </Text>
           </View>
           <View style={styles.infoColumn}>
             <Text style={styles.infoLabel}>Time</Text>
             <Text style={styles.infoValue}>
               {eventDate
-                ? eventDate.toLocaleTimeString('en-GB', {
-                    hour: '2-digit',
-                    minute: '2-digit',
+                ? eventDate.toLocaleTimeString("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })
-                : 'N/A'}
+                : "N/A"}
             </Text>
           </View>
         </View>
@@ -90,7 +92,10 @@ const TicketsQRCodeScreen = ({ route }) => {
       </View>
 
       {/* Bouton Retour collé en bas */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
         <Text style={styles.backButtonText}>Back to Tickets</Text>
       </TouchableOpacity>
     </View>

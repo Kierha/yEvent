@@ -36,12 +36,12 @@ export const useReservations = (userId) => {
 
   const addReservation = async (eventId, eventTitle, ticketsCount) => {
     try {
-      console.log("Adding reservation:", {
-        userId,
-        eventId,
-        eventTitle,
-        ticketsCount,
-      });
+      // console.log("Adding reservation:", {
+      //   userId,
+      //   eventId,
+      //   eventTitle,
+      //   ticketsCount,
+      // });
       const newReservation = await createReservation(
         userId,
         eventId,
@@ -52,7 +52,7 @@ export const useReservations = (userId) => {
 
       // Mettre à jour l'événement après avoir ajouté la réservation
       await updateEventFromReservation(eventId, ticketsCount);
-      console.log("Event updated after reservation");
+      // console.log("Event updated after reservation");
     } catch (err) {
       setError(err.message);
       console.error("Error adding reservation:", err);

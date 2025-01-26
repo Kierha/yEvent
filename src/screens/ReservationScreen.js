@@ -34,7 +34,7 @@ const ReservationScreen = ({ route, navigation }) => {
   // Fonction pour gérer la réservation
   const handleReservation = async () => {
     try {
-      console.log("Handling reservation for event:", event);
+      // console.log("Handling reservation for event:", event);
       await addReservation(event.id, event.title, ticketsCount);
       Alert.alert("Succès", "Votre réservation a été confirmée !");
       navigation.navigate("Main"); // Retour à l'accueil
