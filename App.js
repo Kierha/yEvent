@@ -8,6 +8,7 @@ import MainTabNavigator from "./src/navigation/MainTabNavigator"; // Navigation 
 import EventDetailsScreen from "./src/screens/EventDetailsScreen"; // Écran des détails d'un événement
 import ReservationScreen from "./src/screens/ReservationScreen"; // Écran de réservation
 import TicketsQRCodeScreen from "./src/screens/TicketsQrCodeScreen"; // Écran du QR code des tickets
+import QRCodeScannerScreen from "./src/screens/QrCodeScannerScreen"; // Écran du scanner de QR code
 
 const Stack = createStackNavigator();
 
@@ -57,6 +58,14 @@ export default function App() {
           <Stack.Screen
             name="TicketsQRCode"
             component={TicketsQRCodeScreen}
+            options={{
+              headerShown: false,
+            }}
+          />
+          {/* Écran du scanner de QR code */}
+          <Stack.Screen
+            name="QRCodeScanner"
+            component={QRCodeScannerScreen}
             options={{
               headerShown: false,
             }}

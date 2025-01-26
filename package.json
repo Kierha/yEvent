@@ -17,7 +17,7 @@
     "buffer": "^6.0.3",
     "date-fns": "^4.1.0",
     "expo": "~52.0.26",
-    "expo-camera": "~16.0.13",
+    "expo-camera": "~16.0.14",
     "expo-location": "~18.0.5",
     "expo-status-bar": "~2.0.1",
     "qrcode": "^1.5.4",
