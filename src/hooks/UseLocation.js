@@ -3,9 +3,11 @@ import * as Location from "expo-location";
 import { Alert, Linking, Platform } from "react-native";
 
 /**
- * Hook personnalisé pour gérer la géolocalisation de l'utilisateur.
- * - Surveille les services de localisation.
- * - Gère les erreurs de manière appropriée.
+ * Gère la géolocalisation de l'utilisateur.
+ * - Vérifie si les services de localisation sont activés.
+ * - Demande les permissions nécessaires.
+ * - Récupère la position actuelle de l'utilisateur.
+ * @returns {Object} - Contient la localisation, un message d'erreur, et l'état des services de localisation.
  */
 export const useLocation = () => {
   const [location, setLocation] = useState(null);
@@ -13,6 +15,9 @@ export const useLocation = () => {
   const [isLocationEnabled, setIsLocationEnabled] = useState(true);
 
   useEffect(() => {
+    /**
+     * Vérifie l'état des services de localisation et récupère la position de l'utilisateur.
+     */
     const checkLocationServices = async () => {
       try {
         // Vérifie si les services de localisation sont activés

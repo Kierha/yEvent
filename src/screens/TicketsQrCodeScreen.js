@@ -5,13 +5,19 @@ import QRCode from "react-native-qrcode-svg";
 import styles from "../styles/TicketsQrCodeScreenStyle";
 
 /**
- * Écran TicketsQRCodeScreen.
- * - Affiche les détails de la réservation et le QR code.
+ * Écran des détails de réservation avec QR Code.
+ * - Affiche les informations de la réservation et génère un QR Code unique.
+ * @param {Object} route - Contient les paramètres passés à l'écran, incluant la réservation.
+ * @returns {JSX.Element} - Composant TicketsQRCodeScreen.
  */
 const TicketsQRCodeScreen = ({ route }) => {
   const navigation = useNavigation();
   const { reservation } = route.params;
 
+  /**
+   * Vérifie si une réservation est disponible.
+   * - Redirige vers l'écran précédent en cas d'absence de réservation.
+   */
   useEffect(() => {
     if (!reservation) {
       Alert.alert("Erreur", "Aucune réservation trouvée.");
@@ -39,20 +45,20 @@ const TicketsQRCodeScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      {/* Affichage de l'UUID tronqué */}
+      {/* Affichage de l'ID tronqué de la réservation */}
       <Text style={styles.header}>
         Order ID: {reservation.id.substring(0, 8)}
       </Text>
 
-      {/* Carte globale de ticket */}
+      {/* Carte globale contenant le QR Code et les informations */}
       <View style={styles.ticketCard}>
         {/* QR Code */}
         {reservation.id ? (
           <QRCode
             value={reservation.id.toString()}
-            size={200} // QR code plus grand
+            size={200}
             backgroundColor="#FFFFFF"
-            style={styles.qrImage} // Centré
+            style={styles.qrImage}
           />
         ) : (
           <Text style={styles.errorText}>QR Code non disponible</Text>
@@ -61,7 +67,7 @@ const TicketsQRCodeScreen = ({ route }) => {
         {/* Trait de séparation */}
         <View style={styles.divider} />
 
-        {/* Contenu du ticket */}
+        {/* Informations de l'événement */}
         <Text style={styles.eventTitle}>{reservation.event_title}</Text>
 
         <View style={styles.infoRow}>
@@ -98,7 +104,7 @@ const TicketsQRCodeScreen = ({ route }) => {
         </View>
       </View>
 
-      {/* Bouton Retour collé en bas */}
+      {/* Bouton Retour */}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.navigate("Main", { screen: "Tickets" })}

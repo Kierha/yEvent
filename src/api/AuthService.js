@@ -1,9 +1,17 @@
 import { supabase } from "./Supabase";
-import { Alert } from "react-native"; // Assurez-vous que Alert est bien importé
+import { Alert } from "react-native";
 
+/**
+ * Inscrit un nouvel utilisateur.
+ * Crée un compte Supabase Auth (email, mot de passe) et enregistre l'utilisateur dans la table `users`.
+ * @param {string} email - Adresse e-mail de l'utilisateur.
+ * @param {string} password - Mot de passe de l'utilisateur.
+ * @param {string} name - Nom de l'utilisateur.
+ * @returns {Object} - Détails de l'utilisateur créé.
+ * @throws {Error} - En cas d'erreur lors de l'inscription ou de l'insertion dans la base de données.
+ */
 export const signUp = async (email, password, name) => {
   try {
-    // Création de l'utilisateur dans Auth
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
       {
         email,
@@ -11,24 +19,20 @@ export const signUp = async (email, password, name) => {
       }
     );
 
-    // Gestion des erreurs liées à l'inscription
     if (signUpError) {
-      if (signUpError.message.includes("already registered")) {
-        Alert.alert("Error", "This email is already registered.");
-      } else {
-        Alert.alert("Error", "An unexpected error occurred. Please try again.");
-      }
-      return; // Sortir de la fonction proprement
+      const message = signUpError.message.includes("already registered")
+        ? "This email is already registered."
+        : signUpError.message;
+      Alert.alert("Error", message);
+      throw new Error(signUpError.message);
     }
 
     if (!signUpData?.user) {
-      Alert.alert("Error", "No user returned after sign-up.");
-      return;
+      throw new Error("No user returned after sign-up.");
     }
 
     const { user } = signUpData;
 
-    // Insertion dans la table `users`
     const { error: insertError } = await supabase.from("users").insert([
       {
         id: user.id,
@@ -38,35 +42,40 @@ export const signUp = async (email, password, name) => {
     ]);
 
     if (insertError) {
-      Alert.alert("Error", "Failed to create user. Please try again.");
-      return;
+      Alert.alert("Error", insertError.message);
+      throw new Error(insertError.message);
     }
 
     return user;
   } catch (error) {
-    // Ici, on capture toutes les autres erreurs
-    Alert.alert("Error", "An unexpected error occurred.");
-    console.error("Sign-up error:", error.message); // Seulement pour la console dev
+    console.error("Sign-up error:", error.message);
+    throw error;
   }
 };
 
 /**
- * Connexion d'un utilisateur.
- * - Authentifie un utilisateur avec ses identifiants.
+ * Connecte un utilisateur existant.
+ * Authentifie un utilisateur avec ses identifiants (e-mail et mot de passe).
+ * @param {string} email - Adresse e-mail de l'utilisateur.
+ * @param {string} password - Mot de passe de l'utilisateur.
+ * @returns {Object} - Détails de l'utilisateur connecté.
+ * @throws {Error} - En cas d'erreur lors de l'authentification.
  */
 export const login = async (email, password) => {
   const { data: loginData, error: loginError } =
     await supabase.auth.signInWithPassword({ email, password });
+
   if (loginError) {
     throw new Error(loginError.message);
   }
 
-  // loginData.user contient l'utilisateur, loginData.session contient la session
   return loginData.user;
 };
 
 /**
- * Déconnexion d'un utilisateur.
+ * Déconnecte un utilisateur.
+ * Supprime le token de session actuel.
+ * @throws {Error} - En cas d'échec de la déconnexion.
  */
 export const logout = async () => {
   const { error: logoutError } = await supabase.auth.signOut();
@@ -76,32 +85,26 @@ export const logout = async () => {
 };
 
 /**
- * Mise à jour de l'adresse e-mail.
- * - Modifie l'adresse e-mail dans Auth.
- * - Met à jour la table `users` pour avoir une cohérence.
+ * Met à jour l'adresse e-mail d'un utilisateur.
+ * Modifie l'adresse e-mail dans Auth et met à jour la table `users` pour conserver la cohérence.
+ * @param {string} newEmail - Nouvelle adresse e-mail de l'utilisateur.
+ * @throws {Error} - En cas d'échec de la mise à jour.
  */
 export const updateEmail = async (newEmail) => {
-  // Mise à jour dans Auth
   const { data: updateAuthData, error: updateAuthError } =
-    await supabase.auth.updateUser({
-      email: newEmail,
-    });
+    await supabase.auth.updateUser({ email: newEmail });
+
   if (updateAuthError) {
     throw new Error(updateAuthError.message);
   }
 
-  // DEBUG : Log la réponse
-  // console.log('updateAuthData:', updateAuthData);
-
-  // Récupère le user depuis Auth
   const { data: currentUserData, error: currentUserError } =
     await supabase.auth.getUser();
+
   if (currentUserError) {
     throw new Error(currentUserError.message);
   }
-  // console.log('currentUserData après update:', currentUserData);
 
-  // Mise à jour de la table `users`
   const { error: updateDbError } = await supabase
     .from("users")
     .update({ email: newEmail })
@@ -113,25 +116,42 @@ export const updateEmail = async (newEmail) => {
 };
 
 /**
- * Mise à jour du mot de passe dans Auth.
- * - Supabase ne stocke pas le mot de passe en clair, seul Auth est concerné.
+ * Met à jour le mot de passe d'un utilisateur.
+ * Change le mot de passe dans Supabase Auth.
+ * @param {string} newPassword - Nouveau mot de passe de l'utilisateur.
+ * @throws {Error} - En cas d'échec de la mise à jour.
  */
 export const updatePassword = async (newPassword) => {
-  const { data: updateAuthData, error: updateAuthError } =
-    await supabase.auth.updateUser({ password: newPassword });
+  const { error: updateAuthError } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
   if (updateAuthError) {
     throw new Error(updateAuthError.message);
   }
 };
 
 /**
- * Récupération des informations utilisateur dans Auth.
- * - Permet de récupérer l'UID et l'email côté Auth.
+ * Récupère les informations d'un utilisateur connecté.
+ * @returns {Object} - Détails de l'utilisateur, incluant `id`, `email`, et `name`.
+ * @throws {Error} - En cas d'échec de la récupération.
  */
 export const getUserDetails = async () => {
   const { data: userData, error: userError } = await supabase.auth.getUser();
+
   if (userError) {
     throw new Error(userError.message);
   }
-  return userData.user; // Renvoie l'objet user qui contient { id, email, ... }
+
+  const { data: userDetails, error: detailsError } = await supabase
+    .from("users")
+    .select("name")
+    .eq("id", userData.user.id)
+    .single();
+
+  if (detailsError) {
+    throw new Error(detailsError.message);
+  }
+
+  return { ...userData.user, ...userDetails };
 };

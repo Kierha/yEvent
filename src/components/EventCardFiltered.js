@@ -2,9 +2,11 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 /**
- * Composant EventCardFiltered.
- * - Affiche les informations essentielles d'un événement.
- * - Permet la navigation vers les détails de l'événement.
+ * Représente une carte d'événement.
+ * Affiche les informations essentielles d'un événement : titre, genre et prix.
+ * @param {Object} event - Données de l'événement à afficher.
+ * @param {Function} onPress - Fonction appelée lors de la sélection de la carte.
+ * @returns {JSX.Element} - Composant EventCardFiltered.
  */
 const EventCardFiltered = ({ event, onPress }) => {
   return (

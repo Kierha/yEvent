@@ -7,8 +7,15 @@ import { useEvents } from "../hooks/UseEvents";
 import EventMarker from "../components/EventMarker";
 import UserMarker from "../components/UserMarker";
 import EventDetailsPopup from "../components/EventDetailsPopupMap";
-import styles from "../styles/MapEventScreenStyle"; // Import du fichier de style
+import styles from "../styles/MapEventScreenStyle"; // Import des styles
 
+/**
+ * Écran de carte des événements.
+ * - Affiche la carte avec la position actuelle de l'utilisateur.
+ * - Affiche les marqueurs des événements à proximité.
+ * - Permet de visualiser les détails d'un événement sélectionné.
+ * @returns {JSX.Element} - Composant MapEventScreen.
+ */
 const MapEventScreen = () => {
   const navigation = useNavigation();
   const { location, errorMsg, isLocationEnabled } = useLocation();
@@ -22,6 +29,9 @@ const MapEventScreen = () => {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
+  /**
+   * Vérifie l'état des services de localisation et met à jour l'état de chargement.
+   */
   useEffect(() => {
     if (!isLocationEnabled || errorMsg) {
       Alert.alert(
@@ -58,7 +68,9 @@ const MapEventScreen = () => {
     );
   }
 
-  // Filtrer les événements pour n'afficher qu'un seul marqueur par emplacement unique
+  /**
+   * Filtre les événements pour n'afficher qu'un seul marqueur par emplacement unique.
+   */
   const uniqueEvents = [];
   const seenLocations = new Set();
 

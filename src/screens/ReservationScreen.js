@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
-import { useReservations } from "../hooks/UseReservations"; // Import du hook
-import { getUserDetails } from "../api/AuthService"; // Import de la fonction getUserDetails
+import { useReservations } from "../hooks/UseReservations"; // Import du hook personnalisé
+import { getUserDetails } from "../api/AuthService"; // Import de la fonction pour récupérer les détails de l'utilisateur
 import styles from "../styles/ReservationScreenStyle"; // Fichier de styles
 
 /**
  * Écran de réservation d'événement.
- * - Permet à l'utilisateur de choisir le nombre de tickets et de réserver.
+ * - Permet à l'utilisateur de réserver un événement en choisissant le nombre de tickets.
+ * - Affiche les détails de l'événement et les tickets restants.
+ * @param {Object} route - Contient les paramètres passés à l'écran, incluant l'événement.
+ * @param {Object} navigation - Objet de navigation pour gérer les transitions entre écrans.
+ * @returns {JSX.Element} - Composant ReservationScreen.
  */
 const ReservationScreen = ({ route, navigation }) => {
   const { event } = route.params; // Données de l'événement passées en paramètres
   const [userId, setUserId] = useState(null); // État pour l'ID de l'utilisateur
-  const { addReservation } = useReservations(userId); // Passe l'ID de l'utilisateur au hook
-  const [ticketsCount, setTicketsCount] = useState(1); // État pour le nombre de tickets
+  const { addReservation } = useReservations(userId); // Hook personnalisé pour gérer les réservations
+  const [ticketsCount, setTicketsCount] = useState(1); // Nombre de tickets sélectionnés
   const [remainingTickets, setRemainingTickets] = useState(
     event.capacity - event.tickets_sold
-  ); // État pour les tickets restants
+  ); // Tickets restants pour l'événement
 
+  /**
+   * Récupère l'ID de l'utilisateur connecté.
+   */
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -34,7 +41,11 @@ const ReservationScreen = ({ route, navigation }) => {
     fetchUserId();
   }, []);
 
-  // Fonction pour gérer la réservation
+  /**
+   * Gère la réservation d'un événement.
+   * - Appelle la fonction `addReservation` pour ajouter une réservation.
+   * - Redirige vers l'écran du QR code en cas de succès.
+   */
   const handleReservation = async () => {
     try {
       const reservation = await addReservation(
@@ -44,7 +55,7 @@ const ReservationScreen = ({ route, navigation }) => {
       );
       if (reservation) {
         Alert.alert("Succès", "Votre réservation a été confirmée !");
-        navigation.navigate("TicketsQRCode", { reservation }); // Redirige vers l'écran des détails de la réservation avec le QR code
+        navigation.navigate("TicketsQRCode", { reservation }); // Redirection vers l'écran QR code
       } else {
         throw new Error("Aucune réservation trouvée");
       }

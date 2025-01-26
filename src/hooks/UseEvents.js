@@ -4,9 +4,11 @@ import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
 
 /**
- * Hook personnalisé pour récupérer les événements.
- * - Récupère les événements "Trending", "Upcoming", "Nearby", et "All".
- * - Gère les états de chargement et les erreurs.
+ * Hook personnalisé pour récupérer et gérer les événements.
+ * - Récupère les événements classés par catégories : "Trending", "Upcoming", "Nearby", et "All".
+ * - Gère les états de chargement et d'erreur.
+ * @param {Object} userLocation - Coordonnées de l'utilisateur (latitude et longitude).
+ * @returns {Object} - Contient les listes d'événements, les états de chargement/erreur, et des fonctions utilitaires.
  */
 export const useEvents = (userLocation) => {
   const [trendingEvents, setTrendingEvents] = useState([]);
@@ -20,28 +22,30 @@ export const useEvents = (userLocation) => {
     fetchEvents();
   }, [userLocation]);
 
+  /**
+   * Récupère les événements depuis Supabase et les classe par catégories.
+   */
   const fetchEvents = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // All Events
+      // Récupérer tous les événements
       const { data: all, error: allError } = await supabase
         .from("events")
         .select("*");
 
-      // Trending Events
+      // Récupérer les événements "Trending"
       const { data: trending, error: trendingError } = await supabase
         .from("events")
         .select("*")
         .order("tickets_sold", { ascending: false })
         .limit(5);
 
-      // Upcoming Events
+      // Récupérer les événements "Upcoming"
       const now = new Date();
       const threeMonthsLater = new Date();
       threeMonthsLater.setMonth(now.getMonth() + 3);
-
       const { data: upcoming, error: upcomingError } = await supabase
         .from("events")
         .select("*")
@@ -49,7 +53,7 @@ export const useEvents = (userLocation) => {
         .lte("start_date", threeMonthsLater.toISOString())
         .order("start_date", { ascending: true });
 
-      // Nearby Events
+      // Récupérer les événements "Nearby"
       let nearby = [];
       if (userLocation) {
         const { data: nearbyData, error: nearbyError } = await supabase
@@ -60,7 +64,6 @@ export const useEvents = (userLocation) => {
 
         if (nearbyError) throw nearbyError;
 
-        // Filtrer les événements à proximité (par exemple, dans un rayon de 50 km)
         const RADIUS = 50; // Rayon en kilomètres
         nearby = nearbyData.filter((event) => {
           const distance = getDistanceFromLatLonInKm(
@@ -77,52 +80,21 @@ export const useEvents = (userLocation) => {
         throw allError || trendingError || upcomingError;
       }
 
-      // Function to capitalize the first letter
-      const capitalizeFirstLetter = (string) => {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-      };
+      // Formatage des dates pour chaque catégorie
+      const formatDates = (events) =>
+        events.map((event) => ({
+          ...event,
+          start_date: format(
+            new Date(event.start_date),
+            "EEEE dd MMMM yyyy - HH:mm",
+            { locale: enUS }
+          ),
+        }));
 
-      // Format the dates
-      const formattedAll = all.map((event) => ({
-        ...event,
-        start_date: capitalizeFirstLetter(
-          format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", {
-            locale: enUS,
-          })
-        ),
-      }));
-
-      const formattedTrending = trending.map((event) => ({
-        ...event,
-        start_date: capitalizeFirstLetter(
-          format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", {
-            locale: enUS,
-          })
-        ),
-      }));
-
-      const formattedUpcoming = upcoming.map((event) => ({
-        ...event,
-        start_date: capitalizeFirstLetter(
-          format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", {
-            locale: enUS,
-          })
-        ),
-      }));
-
-      const formattedNearby = nearby.map((event) => ({
-        ...event,
-        start_date: capitalizeFirstLetter(
-          format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", {
-            locale: enUS,
-          })
-        ),
-      }));
-
-      setAllEvents(formattedAll);
-      setTrendingEvents(formattedTrending);
-      setUpcomingEvents(formattedUpcoming);
-      setNearbyEvents(formattedNearby);
+      setAllEvents(formatDates(all));
+      setTrendingEvents(formatDates(trending));
+      setUpcomingEvents(formatDates(upcoming));
+      setNearbyEvents(formatDates(nearby));
     } catch (err) {
       console.error("Erreur lors de la récupération des événements :", err);
       setError("Impossible de récupérer les événements.");
@@ -131,7 +103,14 @@ export const useEvents = (userLocation) => {
     }
   };
 
-  // Fonction pour calculer la distance entre deux points géographiques
+  /**
+   * Calcule la distance entre deux coordonnées géographiques.
+   * @param {number} lat1 - Latitude du premier point.
+   * @param {number} lon1 - Longitude du premier point.
+   * @param {number} lat2 - Latitude du second point.
+   * @param {number} lon2 - Longitude du second point.
+   * @returns {number} - Distance en kilomètres.
+   */
   const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
     const R = 6371; // Rayon de la Terre en kilomètres
     const dLat = deg2rad(lat2 - lat1);
@@ -143,15 +122,21 @@ export const useEvents = (userLocation) => {
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // Distance en kilomètres
-    return distance;
+    return R * c;
   };
 
-  const deg2rad = (deg) => {
-    return deg * (Math.PI / 180);
-  };
+  /**
+   * Convertit les degrés en radians.
+   * @param {number} deg - Valeur en degrés.
+   * @returns {number} - Valeur en radians.
+   */
+  const deg2rad = (deg) => deg * (Math.PI / 180);
 
-  // Fonction pour vérifier la disponibilité des places pour un événement spécifique
+  /**
+   * Vérifie la disponibilité des places pour un événement donné.
+   * @param {number} eventId - ID de l'événement.
+   * @returns {boolean} - `true` si des places sont disponibles, sinon `false`.
+   */
   const checkAvailability = async (eventId) => {
     try {
       const { data, error } = await supabase

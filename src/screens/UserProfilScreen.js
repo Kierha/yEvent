@@ -1,97 +1,125 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import { useCameraPermissions } from "expo-camera"; // Import useCameraPermissions
-import { updateEmail, updatePassword, logout } from "../../src/api/AuthService"; // API centralisée
+import { useCameraPermissions } from "expo-camera"; // Importe les permissions de la caméra
+import {
+  getUserDetails,
+  updateEmail,
+  updatePassword,
+  logout,
+} from "../../src/api/AuthService"; // API centralisée pour la gestion utilisateur
 import styles from "../../src/styles/UserProfileStyle";
 
 /**
- * Page utilisateur.
- * - Affiche les informations du profil utilisateur.
- * - Permet de changer l'e-mail ou le mot de passe.
- * - Intègre un scanner QR code.
- * - Inclut un bouton de déconnexion.
+ * Écran du profil utilisateur.
+ * - Permet de changer l'adresse e-mail ou le mot de passe de l'utilisateur.
+ * - Inclut un scanner QR code nécessitant la permission de la caméra.
+ * - Propose un bouton de déconnexion.
+ * @param {Object} navigation - Objet de navigation pour gérer les transitions entre écrans.
+ * @returns {JSX.Element} - Composant UserProfileScreen.
  */
 const UserProfileScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [permission, requestPermission] = useCameraPermissions(); // Utiliser useCameraPermissions
+  const [user, setUser] = useState(null);
+  const [permission, requestPermission] = useCameraPermissions(); // Gère les permissions de la caméra
 
-  // Changement de l'adresse e-mail
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userDetails = await getUserDetails();
+        setUser(userDetails);
+      } catch (error) {
+        Alert.alert("Error", "Unable to retrieve user info.");
+      }
+    };
+    fetchUserDetails();
+  }, []);
+
+  /**
+   * Met à jour l'adresse e-mail de l'utilisateur.
+   */
   const handleEmailUpdate = async () => {
     try {
       await updateEmail(email);
-      Alert.alert("Succès", "Adresse e-mail mise à jour.");
+      Alert.alert("Success", "Email address updated.");
     } catch (error) {
-      Alert.alert("Erreur", error.message);
+      Alert.alert("Error", error.message);
     }
   };
 
-  // Changement du mot de passe
+  /**
+   * Met à jour le mot de passe de l'utilisateur.
+   */
   const handlePasswordUpdate = async () => {
     try {
       await updatePassword(newPassword);
-      Alert.alert("Succès", "Mot de passe mis à jour.");
+      Alert.alert("Success", "Password updated.");
     } catch (error) {
-      Alert.alert("Erreur", error.message);
+      Alert.alert("Error", error.message);
     }
   };
 
-  // Déconnexion de l'utilisateur
+  /**
+   * Déconnecte l'utilisateur et redirige vers l'écran de connexion.
+   */
   const handleLogout = async () => {
     try {
       await logout();
-      navigation.replace("Login"); // Redirection vers la page de connexion
+      navigation.replace("Login"); // Redirection vers l'écran de connexion
     } catch (error) {
-      Alert.alert("Erreur", error.message);
+      Alert.alert("Error", error.message);
     }
   };
 
-  // Demande de permission de la caméra et navigation vers le scanner QR code
+  /**
+   * Demande la permission de la caméra et redirige vers l'écran de scanner QR code.
+   */
   const handleRequestCameraPermission = async () => {
     const { status } = await requestPermission();
     if (status === "granted") {
-      // Alert.alert("Permission accordé");
       navigation.navigate("QRCodeScanner");
     } else {
       Alert.alert(
-        "Permission refusée",
-        "Impossible d'utiliser la caméra sans autorisation."
+        "Permission denied",
+        "Cannot use the camera without permission."
       );
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mon Profil</Text>
+      {user && (
+        <Text style={styles.title}>Hello, {user.name || user.email}</Text>
+      )}
 
       {/* Changement d'adresse e-mail */}
       <View style={styles.section}>
-        <Text style={styles.label}>Changer l'adresse e-mail :</Text>
+        <Text style={styles.label}>Change email address:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Nouvelle adresse e-mail"
+          placeholder="New email address"
           placeholderTextColor="#A0A0A0"
           value={email}
           onChangeText={setEmail}
         />
         <TouchableOpacity style={styles.button} onPress={handleEmailUpdate}>
-          <Text style={styles.buttonText}>Mettre à jour</Text>
+          <Text style={styles.buttonText}>Update email</Text>
         </TouchableOpacity>
       </View>
 
       {/* Changement de mot de passe */}
       <View style={styles.section}>
-        <Text style={styles.label}>Changer le mot de passe :</Text>
+        <Text style={styles.label}>Change password:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Nouveau mot de passe"
+          placeholder="New password"
           placeholderTextColor="#A0A0A0"
           secureTextEntry
           value={newPassword}
           onChangeText={setNewPassword}
         />
         <TouchableOpacity style={styles.button} onPress={handlePasswordUpdate}>
-          <Text style={styles.buttonText}>Mettre à jour</Text>
+          <Text style={styles.buttonText}>Update password</Text>
         </TouchableOpacity>
       </View>
 
@@ -100,7 +128,7 @@ const UserProfileScreen = ({ navigation }) => {
         style={[styles.button, styles.qrButton]}
         onPress={handleRequestCameraPermission}
       >
-        <Text style={styles.buttonText}>Scanner un QR Code</Text>
+        <Text style={styles.buttonText}>Scan a QR Code</Text>
       </TouchableOpacity>
 
       {/* Déconnexion */}
@@ -108,7 +136,7 @@ const UserProfileScreen = ({ navigation }) => {
         style={[styles.button, styles.logoutButton]}
         onPress={handleLogout}
       >
-        <Text style={styles.buttonText}>Déconnexion</Text>
+        <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
   );

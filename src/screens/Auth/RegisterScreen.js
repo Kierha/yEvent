@@ -1,48 +1,43 @@
-/**
- * RegisterScreen.js
- * Écran d'inscription utilisant signUp() depuis AuthService.js
- * pour créer l'utilisateur dans Supabase Auth et dans la table `users`.
- */
-
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import { signUp } from "../../api/AuthService"; // <-- On importe la fonction signUp
-import styles from "../../styles/RegisterScreenStyle"; // <-- Tes styles externalisés
+import { signUp } from "../../api/AuthService"; // Fonction signUp pour gérer l'inscription
+import styles from "../../styles/RegisterScreenStyle"; // Styles externalisés
 
+/**
+ * Écran d'inscription.
+ * - Permet à l'utilisateur de créer un compte.
+ * - Utilise la fonction signUp du AuthService pour créer un utilisateur dans Supabase.
+ * @param {Object} navigation - Objet de navigation pour gérer les transitions entre écrans.
+ * @returns {JSX.Element} - Composant RegisterScreen.
+ */
 const RegisterScreen = ({ navigation }) => {
-  // Champs gérés par l'utilisateur
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   /**
-   * handleRegister
+   * Gère l'inscription de l'utilisateur.
    * - Appelle la fonction signUp du AuthService.
    * - Affiche un message de succès ou d'erreur.
-   * - Redirige vers l'écran de login en cas de réussite.
+   * - Redirige l'utilisateur vers l'écran de connexion en cas de succès.
    */
   const handleRegister = async () => {
     try {
-      // 1. Inscription via AuthService (Auth + insert dans `users`)
       const user = await signUp(email, password, name);
 
-      // 2. Vérifie si l'utilisateur a bien été créé
       if (user) {
         Alert.alert(
           "Succès",
           "Inscription réussie ! Vérifie ta boîte e-mail pour valider ton compte."
         );
-        // 3. Redirige vers la page de login
-        navigation.navigate("Login");
+        navigation.navigate("Login"); // Redirection vers l'écran de connexion
       }
     } catch (error) {
-      // 4. Gère les erreurs
       console.error("Erreur lors de l’inscription :", error);
       Alert.alert("Erreur", error.message || "Une erreur est survenue.");
     }
   };
 
-  // Rendu de l'interface
   return (
     <View style={styles.container}>
       <Text style={styles.title}>YEVENT</Text>

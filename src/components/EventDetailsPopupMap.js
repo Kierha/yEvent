@@ -1,6 +1,14 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from "react-native";
 
+/**
+ * Affiche une popup avec les détails d'un événement sélectionné.
+ * Permet de fermer la popup ou de naviguer vers les détails de l'événement.
+ * @param {Object} event - Détails de l'événement à afficher.
+ * @param {Function} onClose - Fonction appelée pour fermer la popup.
+ * @param {Function} onViewDetails - Fonction appelée pour afficher les détails de l'événement.
+ * @returns {JSX.Element} - Composant EventDetailsPopupMap.
+ */
 const EventDetailsPopupMap = ({ event, onClose, onViewDetails }) => {
   return (
     <Modal transparent visible animationType="fade">

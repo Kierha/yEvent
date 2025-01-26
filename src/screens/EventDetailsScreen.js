@@ -12,9 +12,12 @@ import { useEvents } from "../hooks/UseEvents";
 import styles from "../styles/EventDetailsStyle";
 
 /**
- * Page des détails d'un événement.
- * - Affiche les informations détaillées d'un événement.
- * - Inclut le bouton d'achat et les informations liées à la localisation.
+ * Écran des détails d'un événement.
+ * - Affiche les informations détaillées sur un événement sélectionné.
+ * - Permet d'acheter des billets si l'événement n'est pas complet.
+ * @param {Object} route - Contient les paramètres passés à l'écran.
+ * @param {Object} navigation - Objet de navigation pour gérer les transitions entre écrans.
+ * @returns {JSX.Element} - Composant EventDetailsScreen.
  */
 const EventDetailsScreen = ({ route, navigation }) => {
   const { event } = route.params; // Données de l'événement passées en paramètres
@@ -22,6 +25,9 @@ const EventDetailsScreen = ({ route, navigation }) => {
   const [isSoldOut, setIsSoldOut] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Vérifie la disponibilité des billets pour l'événement.
+   */
   useEffect(() => {
     const fetchAvailability = async () => {
       const available = await checkAvailability(event.id);
@@ -96,7 +102,7 @@ const EventDetailsScreen = ({ route, navigation }) => {
           style={[styles.buyButton, isSoldOut && styles.soldOutButton]}
           onPress={() =>
             !isSoldOut && navigation.navigate("Reservation", { event })
-          } // Passez les détails de l'événement
+          }
           disabled={isSoldOut}
         >
           <Text style={styles.buyButtonText}>

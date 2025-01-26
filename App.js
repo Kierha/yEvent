@@ -1,21 +1,21 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { StatusBar } from "react-native"; // Barre d'état pour le thème sombre
+import { StatusBar } from "react-native";
 import LoginScreen from "./src/screens/Auth/LoginScreen";
 import RegisterScreen from "./src/screens/Auth/RegisterScreen";
-import MainTabNavigator from "./src/navigation/MainTabNavigator"; // Navigation principale avec onglets
-import EventDetailsScreen from "./src/screens/EventDetailsScreen"; // Écran des détails d'un événement
-import ReservationScreen from "./src/screens/ReservationScreen"; // Écran de réservation
-import TicketsQRCodeScreen from "./src/screens/TicketsQrCodeScreen"; // Écran du QR code des tickets
-import QRCodeScannerScreen from "./src/screens/QrCodeScannerScreen"; // Écran du scanner de QR code
+import MainTabNavigator from "./src/navigation/MainTabNavigator";
+import EventDetailsScreen from "./src/screens/EventDetailsScreen";
+import ReservationScreen from "./src/screens/ReservationScreen";
+import TicketsQRCodeScreen from "./src/screens/TicketsQrCodeScreen";
+import QRCodeScannerScreen from "./src/screens/QrCodeScannerScreen";
 
 const Stack = createStackNavigator();
 
 /**
  * Composant principal de l'application.
- * - Configure la navigation principale.
- * - Définit les écrans de connexion, d'inscription, de navigation principale et de détails d'événement.
+ * - Configure la navigation principale avec un Stack Navigator.
+ * - Définit les écrans de connexion, d'inscription, de navigation principale, et les écrans liés aux événements.
  */
 export default function App() {
   return (
@@ -25,13 +25,17 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Login"
-          screenOptions={{ headerShown: false }}
+          screenOptions={{
+            headerShown: false, // Cache l'en-tête par défaut
+          }}
         >
           {/* Écrans d'authentification */}
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
-          {/* Navigation principale */}
+
+          {/* Navigation principale avec onglets */}
           <Stack.Screen name="Main" component={MainTabNavigator} />
+
           {/* Détails d'un événement */}
           <Stack.Screen
             name="EventDetails"
@@ -43,31 +47,34 @@ export default function App() {
               title: "Event Details",
             }}
           />
+
           {/* Écran de réservation */}
           <Stack.Screen
             name="Reservation"
             component={ReservationScreen}
             options={{
-              headerShown: true,
+              headerShown: true, // Affiche l'en-tête pour cet écran
               headerStyle: { backgroundColor: "#000" },
               headerTintColor: "#FFF",
               title: "Reservation",
             }}
           />
+
           {/* Écran du QR code des tickets */}
           <Stack.Screen
             name="TicketsQRCode"
             component={TicketsQRCodeScreen}
             options={{
-              headerShown: false,
+              headerShown: false, // Cache l'en-tête pour cet écran
             }}
           />
+
           {/* Écran du scanner de QR code */}
           <Stack.Screen
             name="QRCodeScanner"
             component={QRCodeScannerScreen}
             options={{
-              headerShown: false,
+              headerShown: false, // Cache l'en-tête pour cet écran
             }}
           />
         </Stack.Navigator>

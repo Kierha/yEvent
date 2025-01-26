@@ -1,10 +1,12 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 /**
- * Composant UpcomingEventCard.
- * - Représente un événement unique pour la section "Upcoming".
- * - Permet la navigation vers les détails de l'événement.
+ * Affiche une carte pour un événement à venir.
+ * Inclut l'image, le titre, le genre et le prix de l'événement.
+ * @param {Object} event - Détails de l'événement à afficher.
+ * @param {Function} onPress - Fonction appelée lors de la sélection de la carte.
+ * @returns {JSX.Element} - Composant UpcomingEventCard.
  */
 const UpcomingEventCard = ({ event, onPress }) => {
   return (
@@ -21,36 +23,36 @@ const UpcomingEventCard = ({ event, onPress }) => {
 
 const styles = StyleSheet.create({
   card: {
-    width: '100%',
+    width: "100%",
     height: 200,
-    flexDirection: 'row',
-    backgroundColor: '#222',
+    flexDirection: "row",
+    backgroundColor: "#222",
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: 15,
   },
   image: {
-    width: '40%',
-    height: '100%',
+    width: "40%",
+    height: "100%",
   },
   details: {
     flex: 1,
     padding: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFF',
+    fontWeight: "bold",
+    color: "#FFF",
   },
   genre: {
     fontSize: 14,
-    color: '#AAA',
+    color: "#AAA",
     marginVertical: 5,
   },
   price: {
     fontSize: 16,
-    color: '#4CAF50',
+    color: "#4CAF50",
   },
 });
 

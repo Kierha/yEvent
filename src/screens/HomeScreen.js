@@ -9,12 +9,19 @@ import {
 } from "react-native";
 import TrendingEventCard from "../components/TrendingEventCard";
 import UpcomingEventCard from "../components/UpcomingEventCard";
-import EventCardFiltered from "../components/EventCardFiltered"; // Utiliser le composant EventCardFiltered
+import EventCardFiltered from "../components/EventCardFiltered";
 import CategoryFilter from "../components/CategorieFilter";
 import { useEvents } from "../hooks/UseEvents";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "../styles/HomeScreenStyle";
 
+/**
+ * Écran d'accueil.
+ * - Affiche les événements populaires, à venir, et les événements filtrés.
+ * - Inclut une barre de recherche et des filtres par catégorie.
+ * @param {Object} navigation - Objet de navigation pour gérer les transitions entre écrans.
+ * @returns {JSX.Element} - Composant HomeScreen.
+ */
 const HomeScreen = ({ navigation }) => {
   const { allEvents, trendingEvents, upcomingEvents, loading } = useEvents();
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,13 +29,19 @@ const HomeScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [filtersVisible, setFiltersVisible] = useState(false);
 
-  // Fonction de recherche
+  /**
+   * Met à jour les événements affichés en fonction de la recherche et des filtres.
+   * @param {string} query - Texte saisi dans la barre de recherche.
+   */
   const handleSearch = (query) => {
     setSearchQuery(query);
     filterEvents(query, selectedCategory);
   };
 
-  // Fonction de filtrage par catégorie
+  /**
+   * Met à jour les événements affichés en fonction de la catégorie sélectionnée.
+   * @param {string} category - Catégorie sélectionnée.
+   */
   const handleFilter = (category) => {
     if (selectedCategory === category) {
       setSelectedCategory("");
@@ -39,7 +52,11 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Filtrer les événements en fonction de la recherche et de la catégorie
+  /**
+   * Filtre les événements en fonction de la recherche et de la catégorie.
+   * @param {string} query - Texte saisi dans la barre de recherche.
+   * @param {string} category - Catégorie sélectionnée.
+   */
   const filterEvents = (query, category) => {
     let filtered = [...allEvents];
 
@@ -92,7 +109,7 @@ const HomeScreen = ({ navigation }) => {
         />
       </TouchableOpacity>
 
-      {/* Catégories de filtres */}
+      {/* Filtres par catégorie */}
       {filtersVisible && (
         <View style={styles.categoryContainer}>
           <CategoryFilter

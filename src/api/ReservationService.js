@@ -1,6 +1,6 @@
 import { supabase } from "./Supabase";
 import QRCode from "qrcode-svg";
-import { Buffer } from "buffer"; // Nécessaire pour gérer la conversion en base64
+import { Buffer } from "buffer";
 
 /**
  * Génère un QR code en base64.
@@ -23,12 +23,12 @@ const generateQrCodeBase64 = (content) => {
 };
 
 /**
- * Crée une nouvelle réservation.
+ * Crée une nouvelle réservation et génère un QR code associé.
  * @param {string} userId - ID de l'utilisateur.
  * @param {string} eventId - ID de l'événement.
  * @param {string} eventTitle - Titre de l'événement.
  * @param {number} ticketsCount - Nombre de billets.
- * @returns {Promise<Object>} - Réservation insérée.
+ * @returns {Promise<Object>} - Données de la réservation insérée.
  */
 export const createReservation = async (
   userId,
@@ -41,14 +41,10 @@ export const createReservation = async (
       throw new Error("Invalid input values");
     }
 
-    // Génération du QR code en base64
     const qrCodeContent = `https://kierha.github.io/tickets_details/index.html?id=${eventId}`;
     const qrCodeBase64 = generateQrCodeBase64(qrCodeContent);
-
-    // Ajout de la date de réservation
     const reservationDate = new Date().toISOString();
 
-    // Insertion de la réservation dans la table "reservations"
     const { data, error } = await supabase.from("reservations").insert(
       {
         user_id: userId,
@@ -58,12 +54,11 @@ export const createReservation = async (
         reservation_date: reservationDate,
         qr_code: qrCodeBase64,
       },
-      { returning: "minimal" } // Retourne uniquement l'ID de la réservation
+      { returning: "minimal" }
     );
 
     if (error) throw new Error(error.message);
 
-    // Vérifie manuellement si la réservation a bien été ajoutée
     const { data: insertedReservation, error: fetchError } = await supabase
       .from("reservations")
       .select(
@@ -82,12 +77,11 @@ export const createReservation = async (
       .limit(1);
 
     if (fetchError) throw new Error(fetchError.message);
-
     if (!insertedReservation || insertedReservation.length === 0) {
       throw new Error("Failed to fetch inserted reservation.");
     }
 
-    return insertedReservation[0]; // Retourne la réservation insérée
+    return insertedReservation[0];
   } catch (err) {
     console.error("Error creating reservation:", err.message);
     throw new Error(err.message);

@@ -3,13 +3,18 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 /**
- * Composant TicketCard.
- * - Affiche l'image de l'événement et les informations essentielles.
- * - Navigue vers la page de détails et le QR code.
+ * Affiche une carte avec les détails d'une réservation.
+ * Inclut l'image de l'événement, le titre, le nombre de billets et la date.
+ * Permet la navigation vers la page de QR code pour la réservation.
+ * @param {Object} reservation - Détails de la réservation à afficher.
+ * @returns {JSX.Element} - Composant TicketCard.
  */
 const TicketCard = ({ reservation }) => {
   const navigation = useNavigation();
 
+  /**
+   * Gère la navigation vers la page des détails de la réservation et QR code.
+   */
   const handlePress = () => {
     navigation.navigate("TicketsQRCode", { reservation });
   };
