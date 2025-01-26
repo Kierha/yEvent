@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 
 /**
  * Styles pour la page d'accueil (HomeScreen).
@@ -7,13 +7,13 @@ import { StyleSheet } from 'react-native';
 const HomeScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     padding: 20,
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#333',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#333",
     borderRadius: 5,
     marginBottom: 20,
     paddingHorizontal: 10,
@@ -24,31 +24,48 @@ const HomeScreenStyles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    color: '#FFF',
+    color: "#FFF",
+  },
+  filterToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#333",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    marginBottom: 10,
+  },
+  filterToggleText: {
+    color: "#FFF",
+    fontSize: 16,
+  },
+  categoryContainer: {
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FFF',
+    fontWeight: "bold",
+    color: "#FFF",
     marginVertical: 10,
   },
   loadingText: {
     fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
+    color: "#888",
+    textAlign: "center",
     marginVertical: 10,
   },
   placeholderText: {
     fontSize: 14,
-    color: '#888',
+    color: "#888",
     marginTop: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   locationText: {
     fontSize: 14,
-    color: '#4CAF50',
+    color: "#4CAF50",
     marginVertical: 5,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 

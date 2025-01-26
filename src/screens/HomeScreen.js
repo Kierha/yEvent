@@ -1,95 +1,166 @@
-import React from 'react';
-import { View, Text, ScrollView, TextInput, Alert, FlatList } from 'react-native';
-import TrendingEventCard from '../components/TrendingEventCard';
-import UpcomingEventCard from '../components/UpcomingEventCard';
-import NearbyEventCard from '../components/NearbyEventCard';
-import CategoryFilter from '../components/CategorieFilter';
-import { useEvents } from '../hooks/UseEvents';
-import { useLocation } from '../hooks/UseLocation';
-import Icon from 'react-native-vector-icons/Ionicons';
-import styles from '../styles/HomeScreenStyle';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import TrendingEventCard from "../components/TrendingEventCard";
+import UpcomingEventCard from "../components/UpcomingEventCard";
+import EventCardFiltered from "../components/EventCardFiltered"; // Utiliser le composant EventCardFiltered
+import CategoryFilter from "../components/CategorieFilter";
+import { useEvents } from "../hooks/UseEvents";
+import Icon from "react-native-vector-icons/Ionicons";
+import styles from "../styles/HomeScreenStyle";
 
-/**
- * Page d'accueil (HomeScreen).
- * - Affiche les sections d'événements (Trending, Upcoming, Nearby).
- * - Inclut un champ de recherche, des filtres de catégories et gère la géolocalisation.
- */
 const HomeScreen = ({ navigation }) => {
-  const { trendingEvents, upcomingEvents, nearbyEvents, loading } = useEvents();
-  const { location, errorMsg } = useLocation();
+  const { trendingEvents, upcomingEvents, loading } = useEvents();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [filtersVisible, setFiltersVisible] = useState(false);
 
-  // Gestion des erreurs de géolocalisation
-  if (errorMsg) {
-    Alert.alert('Erreur', errorMsg);
-  }
+  // Fonction de recherche
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    filterEvents(query, selectedCategory);
+  };
+
+  // Fonction de filtrage par catégorie
+  const handleFilter = (category) => {
+    if (selectedCategory === category) {
+      setSelectedCategory("");
+      setFilteredEvents([]);
+    } else {
+      setSelectedCategory(category);
+      filterEvents(searchQuery, category);
+    }
+  };
+
+  // Filtrer les événements en fonction de la recherche et de la catégorie
+  const filterEvents = (query, category) => {
+    let filtered = [...trendingEvents, ...upcomingEvents];
+
+    if (query) {
+      filtered = filtered.filter((event) =>
+        event.title.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    if (category) {
+      filtered = filtered.filter((event) =>
+        event.genre.toLowerCase().includes(category.toLowerCase())
+      );
+    }
+
+    setFilteredEvents(filtered);
+  };
 
   return (
     <View style={styles.container}>
       {/* Barre de recherche */}
       <View style={styles.searchContainer}>
-        <Icon name="search-outline" size={20} color="#FFF" style={styles.searchIcon} />
+        <Icon
+          name="search-outline"
+          size={20}
+          color="#FFF"
+          style={styles.searchIcon}
+        />
         <TextInput
           style={styles.searchInput}
           placeholder="Search events"
           placeholderTextColor="#888"
+          value={searchQuery}
+          onChangeText={handleSearch}
         />
       </View>
+
+      {/* Bouton pour afficher/masquer les filtres */}
+      <TouchableOpacity
+        style={styles.filterToggle}
+        onPress={() => setFiltersVisible(!filtersVisible)}
+      >
+        <Text style={styles.filterToggleText}>
+          {filtersVisible ? "Hide Filters" : "Show Filters"}
+        </Text>
+        <Icon
+          name={filtersVisible ? "chevron-up-outline" : "chevron-down-outline"}
+          size={20}
+          color="#FFF"
+        />
+      </TouchableOpacity>
 
       {/* Catégories de filtres */}
-      <View style={styles.categoryContainer}>
-        <CategoryFilter />
-      </View>
-
-      <ScrollView>
-        {/* Section Trending Events */}
-        <Text style={styles.sectionTitle}>Trending Events</Text>
-        <FlatList
-          data={trendingEvents}
-          renderItem={({ item }) => (
-            <TrendingEventCard
-              event={item}
-              onPress={() => navigation.navigate('EventDetails', { event: item })}
-            />
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
-
-        {/* Section Upcoming Events */}
-        <Text style={styles.sectionTitle}>Upcoming Events</Text>
-        <View style={styles.upcomingEventContainer}>
-          {loading ? (
-            <Text style={styles.loadingText}>Chargement...</Text>
-          ) : upcomingEvents.length > 0 ? (
-            <UpcomingEventCard
-              event={upcomingEvents[0]}
-              onPress={() => navigation.navigate('EventDetails', { event: upcomingEvents[0] })}
-            />
-          ) : (
-            <Text style={styles.placeholderText}>Aucun événement à venir.</Text>
-          )}
+      {filtersVisible && (
+        <View style={styles.categoryContainer}>
+          <CategoryFilter
+            selectedCategory={selectedCategory}
+            onFilter={handleFilter}
+          />
         </View>
+      )}
 
-        {/* Section Nearby Events */}
-        <Text style={styles.sectionTitle}>Nearby Events</Text>
-        {location ? (
+      {loading ? (
+        <Text style={styles.loadingText}>Loading...</Text>
+      ) : searchQuery || selectedCategory ? (
+        filteredEvents.length > 0 ? (
           <FlatList
-            data={nearbyEvents}
+            data={filteredEvents}
             renderItem={({ item }) => (
-              <NearbyEventCard
+              <EventCardFiltered
                 event={item}
-                onPress={() => navigation.navigate('EventDetails', { event: item })}
+                onPress={() =>
+                  navigation.navigate("EventDetails", { event: item })
+                }
+              />
+            )}
+            keyExtractor={(item) => item.id.toString()}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <Text style={styles.placeholderText}>
+            No events found for the current search or filter.
+          </Text>
+        )
+      ) : (
+        <ScrollView>
+          {/* Section Trending Events */}
+          <Text style={styles.sectionTitle}>Trending Events</Text>
+          <FlatList
+            data={trendingEvents}
+            renderItem={({ item }) => (
+              <TrendingEventCard
+                event={item}
+                onPress={() =>
+                  navigation.navigate("EventDetails", { event: item })
+                }
               />
             )}
             keyExtractor={(item) => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
           />
-        ) : (
-          <Text style={styles.loadingText}>Chargement de la localisation...</Text>
-        )}
-      </ScrollView>
+
+          {/* Section Upcoming Events */}
+          <Text style={styles.sectionTitle}>Upcoming Events</Text>
+          <View style={styles.upcomingEventContainer}>
+            {upcomingEvents.length > 0 ? (
+              <UpcomingEventCard
+                event={upcomingEvents[0]}
+                onPress={() =>
+                  navigation.navigate("EventDetails", {
+                    event: upcomingEvents[0],
+                  })
+                }
+              />
+            ) : (
+              <Text style={styles.placeholderText}>No upcoming events.</Text>
+            )}
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 };

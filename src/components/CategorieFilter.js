@@ -1,27 +1,47 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 
 const categories = [
-  { name: 'Music Concert', colors: ['#FF9A8B', '#FF6A88'] },
-  { name: 'City Festival', colors: ['#FFD700', '#FFA500'] },
-  { name: 'Theatre', colors: ['#A1C4FD', '#C2E9FB'] },
-  { name: 'Fashion Show', colors: ['#4CAF50', '#388E3C'] },
-  { name: 'Comedy', colors: ['#FBC2EB', '#A6C1EE'] },
-  { name: 'Workshop', colors: ['#FDEB71', '#F8D800'] },
+  { name: "Music Concert", colors: ["#FF9A8B", "#FF6A88"] },
+  { name: "City Festival", colors: ["#FFD700", "#FFA500"] },
+  { name: "Theatre", colors: ["#A1C4FD", "#C2E9FB"] },
+  { name: "Fashion Show", colors: ["#4CAF50", "#388E3C"] },
+  { name: "Comedy", colors: ["#FBC2EB", "#A6C1EE"] },
+  { name: "Workshop", colors: ["#FDEB71", "#F8D800"] },
 ];
 
 /**
  * Composant CategoryFilter.
  * - Affiche les catégories sur deux lignes avec un défilement horizontal.
+ * - Permet de filtrer les événements par catégorie.
  */
-const CategoryFilter = () => {
+const CategoryFilter = ({ selectedCategory, onFilter }) => {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContainer}
+    >
       {categories.map((category, index) => (
         <View key={index} style={styles.categoryContainer}>
           <TouchableOpacity
-            style={[styles.categoryButton, { backgroundColor: category.colors[0] }]}
+            style={[
+              styles.categoryButton,
+              {
+                backgroundColor:
+                  selectedCategory === category.name
+                    ? category.colors[1]
+                    : category.colors[0],
+              },
+            ]}
             activeOpacity={0.8}
+            onPress={() => onFilter(category.name)}
           >
             <Text style={styles.categoryText}>{category.name}</Text>
           </TouchableOpacity>
@@ -33,27 +53,27 @@ const CategoryFilter = () => {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap', // Permet de répartir les éléments en plusieurs lignes
+    flexDirection: "row",
+    flexWrap: "wrap", // Permet de répartir les éléments en plusieurs lignes
     paddingHorizontal: 2,
   },
   categoryContainer: {
-    width: '30%', // Largeur fixe pour chaque catégorie (environ 1/3 de l'écran)
+    width: "30%", // Largeur fixe pour chaque catégorie (environ 1/3 de l'écran)
     paddingHorizontal: 5,
     marginBottom: 10,
   },
   categoryButton: {
     height: 40, // Hauteur des boutons
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 10,
     elevation: 5, // Ombre pour un effet 3D
   },
   categoryText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
