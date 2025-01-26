@@ -1,151 +1,171 @@
 # yEvent
 
-yEvent est une application mobile de gestion d'événements, permettant aux utilisateurs de consulter des événements, de réserver des billets, de visualiser leurs réservations et de gérer leur profil utilisateur. L'application est développée avec React Native et utilise Supabase pour la gestion des données backend.
+yEvent est une application mobile de gestion d'événements permettant aux utilisateurs de consulter des événements, de réserver des billets, de visualiser leurs réservations et de gérer leur profil utilisateur. L'application est développée avec **React Native** et utilise **Supabase** pour la gestion des données backend.
 
-## Fonctionnalités
+---
 
-### Développement UI/UX et Navigation
+## Fonctionnalités principales
 
-#### Structure et Navigation
+### **1. Navigation intuitive et écrans clés**
 
-- **Bottom Tab Navigation** : L'application est organisée avec une navigation par onglets en bas pour accéder rapidement aux sections principales :
+#### Structure et navigation
+
+- **Bottom Tab Navigation** :
   - Accueil (liste des événements)
   - Profil utilisateur
   - Réservations
   - Carte des événements
 
-#### Écrans Principaux
+#### Écrans principaux
 
 1. **Accueil (Home Screen)**
 
-   - Affiche la liste des événements avec image, titre, date, et bouton pour afficher les détails.
-   - Gère les différents états : Aucun événement disponible ou liste d'événements.
-   - Recherche et filtres par catégorie.
+   - Affiche une liste d’événements avec image, titre, date et bouton pour consulter les détails.
+   - Recherche d’événements et filtres par catégorie.
+   - Gestion des différents états : Aucun événement disponible ou liste d’événements.
 
-2. **Détails de l'événement (Event Details Screen)**
+2. **Détails de l’événement (Event Details Screen)**
 
-   - Affiche les informations complètes sur un événement (nom, description, lieu, date, disponibilité des billets).
-   - Gère les états : complet ou nombre de places restantes, et si c’est passé ou à venir.
-   - Permet de réserver un billet si l’événement n’est pas complet.
+   - Affiche les informations complètes d’un événement (description, lieu, date, disponibilité des billets).
+   - Permet de réserver si l’événement n’est pas complet.
 
 3. **Réservation (Booking Screen)**
 
-   - Crée un formulaire contenant : nom, email, et nombre de billets.
-   - Affiche les informations de l'événement et permet de sélectionner le nombre de billets à réserver.
+   - Affiche les informations sur l’événement et permet de sélectionner un nombre de billets à réserver.
 
 4. **Confirmation (Confirmation Screen)**
 
-   - Affiche un résumé de la réservation avec un numéro de confirmation et, si disponible, un QR Code généré pour l’accès.
+   - Affiche un résumé de la réservation avec un numéro de confirmation et un QR Code pour l’accès.
 
 5. **Profil utilisateur (User Profile Screen)**
 
    - Affiche les informations de l’utilisateur (nom, email).
-   - Liste les événements auxquels il participe.
-   - Gère les états : Aucun événement réservé ou liste d’événements triés par date.
-   - Permet de mettre à jour l'email et le mot de passe de l'utilisateur.
-   - Inclut un bouton de déconnexion.
+   - Permet de mettre à jour l’adresse email et le mot de passe.
+   - Affiche les événements auxquels l’utilisateur participe (triés par date).
+   - Bouton de déconnexion.
 
 6. **Carte des événements (Map Event Screen)**
 
    - Affiche la position actuelle de l’utilisateur sur une carte.
    - Permet de localiser les événements grâce à des marqueurs.
-   - Affiche les détails de l'événement sélectionné sur la carte.
+   - Affiche les détails d’un événement sélectionné sur la carte.
 
 7. **Scanner de QR Code (QR Code Scanner Screen)**
-   - Implémente une fonctionnalité pour scanner un QR Code généré après une réservation.
+   - Permet de scanner un QR Code généré après une réservation.
 
-### Développement Backend avec Supabase
+---
 
-#### Création et Gestion des Données
+## **Backend avec Supabase**
 
-- **Modélisation des tables nécessaires dans Supabase** :
-  - Utilisateurs : ID, nom, email, mot de passe (optionnel).
-  - Événements : ID, titre, description, lieu, date, capacité, places restantes.
-  - Réservations : ID, utilisateur, événement, nombre de billets.
+### Modélisation des données
 
-#### API Supabase
+- **Utilisateurs** : ID, nom, email, mot de passe (optionnel).
+- **Événements** : ID, titre, description, lieu, date, capacité, places restantes.
+- **Réservations** : ID, utilisateur, événement, nombre de billets.
 
-- **Configuration de Supabase pour récupérer et modifier les données de l’application** :
-  - Liste des événements (GET)
-  - Création d’une réservation (POST)
-  - Liste des réservations d’un utilisateur (GET)
+### Fonctionnalités backend
 
-#### Gestion des États avec Supabase
-
+- Gestion des données avec **Supabase** :
+  - Récupération de la liste des événements (GET).
+  - Création d’une réservation (POST).
+  - Liste des réservations d’un utilisateur (GET).
 - Mise à jour automatique des places restantes après chaque réservation.
-- Affichage des informations en temps réel (exemple : événements complets).
+- Affichage en temps réel des informations (exemple : événements complets).
 
-### Intégration de Fonctionnalités Natives et Gestion des États
+---
 
-#### Géolocalisation
+## **Fonctionnalités natives et gestion des états**
 
-- Affiche la position actuelle de l’utilisateur sur une carte.
-- Permet de localiser l’événement grâce à un marqueur.
+### **Géolocalisation**
 
-#### Caméra et QR Code
+- Affiche la position actuelle de l’utilisateur.
+- Permet de localiser les événements grâce à des marqueurs.
 
-- Implémente une fonctionnalité pour scanner un QR Code généré après une réservation.
+### **Caméra et QR Code**
 
-#### Gestion des États Utilisateur
+- Implémentation d’un scanner de QR Code pour valider l’accès aux événements.
 
-- Affiche un message clair lorsque :
-  - Un utilisateur n’a réservé aucun événement.
+### **Gestion des états utilisateur**
+
+- Messages clairs lorsque :
+  - Aucun événement n’est réservé.
   - Un événement est complet.
+- Loaders pour les appels API et messages de succès/erreurs.
 
-#### Feedback Utilisateur
+---
 
-- Ajoute des messages pour les erreurs et succès (exemple : "Événement complet", "Réservation confirmée").
-- Intègre des loaders pour les appels API.
+## Installation et lancement
 
-## Installation et Lancement
+### **Prérequis**
 
-### Prérequis
+- **Node.js**
+- **Expo CLI**
 
-- Node.js
-- Expo CLI
-
-### Installation
+### **Installation**
 
 1. Clonez le dépôt :
-   ```sh
-   git clone <URL_DU_DEPOT>
+   ```bash
+   git clone https://github.com/Kierha/yEvent
    cd yEvent
    ```
-2. Installer les dépendances :
-   ```sh
+2. Installez les dépendances :
+   ```bash
    npm install
    ```
 
-### Lancement de l'Application
+### **Lancement de l'application**
 
-Pour démarrer l'application, utilisez la commande suivante :
+Démarrez l’application avec la commande suivante :
 
-    ```sh
-    expo start
-    ```
+```bash
+expo start
+```
 
-Ensuite, scannez le QR code affiché dans le terminal ou dans le navigateur avec l'application Expo Go sur votre appareil mobile.
+Ensuite, scannez le QR code affiché dans le terminal ou le navigateur avec l’application **Expo Go**.
 
-### Build APK
+### **Build APK**
 
-Pour générer un fichier APK pour Android, suivez les étapes ci-dessous :
+Pour générer un fichier APK pour Android :
 
-1. Assurez-vous d'avoir installé les outils nécessaires :
-
-   ```sh
+1. Installez les outils nécessaires :
+   ```bash
    npm install -g eas-cli
    ```
-
-2. Configurez votre projet pour EAS Build :
-
-   ```sh
+2. Configurez votre projet pour **EAS Build** :
+   ```bash
    eas build:configure
    ```
-
 3. Lancez le processus de build pour Android :
-
-   ```sh
+   ```bash
    eas build -p android
    ```
+4. Une fois le build terminé, téléchargez le fichier APK depuis le lien fourni.
 
-4. Une fois le build terminé, vous recevrez un lien pour télécharger le fichier APK.
+---
+
+## **Livrables attendus**
+
+1. **Diagrammes UML** :
+
+   - Diagramme de classes modélisant les relations entre utilisateur, événement et réservation.
+   - Diagramme de cas d’utilisation pour décrire les interactions utilisateur (inscription, réservation, etc.).
+
+2. **Application fonctionnelle** :
+
+   - Tous les écrans et fonctionnalités mentionnés.
+   - Intégration backend avec Supabase.
+   - Respect des bonnes pratiques UI/UX.
+
+3. **Design soigné** :
+   - Inspiré de plateformes comme **Dribbble** ou **Behance**.
+
+---
+
+## **Ressources utiles**
+
+- [Documentation officielle React Native](https://reactnative.dev)
+- [Documentation Expo](https://docs.expo.dev)
+- [React Native Elements](https://reactnativeelements.com)
+- [Supabase Documentation](https://supabase.io)
+- [Dribbble](https://dribbble.com) / [Behance](https://www.behance.net) pour l’inspiration design
+- [GitHub](https://github.com) pour le versionnage
