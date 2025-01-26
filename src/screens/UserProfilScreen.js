@@ -50,7 +50,7 @@ const UserProfileScreen = ({ navigation }) => {
   const handleRequestCameraPermission = async () => {
     const { status } = await requestPermission();
     if (status === "granted") {
-      Alert.alert("Permission accordé");
+      // Alert.alert("Permission accordé");
       navigation.navigate("QRCodeScanner");
     } else {
       Alert.alert(

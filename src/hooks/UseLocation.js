@@ -53,13 +53,8 @@ export const useLocation = () => {
       }
     };
 
-    // Vérifie l'état de la localisation toutes les 5 secondes
-    const interval = setInterval(() => {
-      checkLocationServices();
-    }, 5000);
-
-    // Nettoie l'intervalle lorsque le composant est démonté
-    return () => clearInterval(interval);
+    // Vérifie l'état de la localisation lors du montage du composant
+    checkLocationServices();
   }, []);
 
   return { location, errorMsg, isLocationEnabled };

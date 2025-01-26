@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../api/Supabase';
-import { format } from 'date-fns';
-import { enUS } from 'date-fns/locale';
+import { useState, useEffect } from "react";
+import { supabase } from "../api/Supabase";
+import { format } from "date-fns";
+import { enUS } from "date-fns/locale";
 
 /**
  * Hook personnalisé pour récupérer les événements.
@@ -26,9 +26,9 @@ export const useEvents = (userLocation) => {
 
       // Trending Events
       const { data: trending, error: trendingError } = await supabase
-        .from('events')
-        .select('*')
-        .order('tickets_sold', { ascending: false })
+        .from("events")
+        .select("*")
+        .order("tickets_sold", { ascending: false })
         .limit(5);
 
       // Upcoming Events
@@ -37,20 +37,38 @@ export const useEvents = (userLocation) => {
       threeMonthsLater.setMonth(now.getMonth() + 3);
 
       const { data: upcoming, error: upcomingError } = await supabase
-        .from('events')
-        .select('*')
-        .gte('start_date', now.toISOString())
-        .lte('start_date', threeMonthsLater.toISOString())
-        .order('start_date', { ascending: true });
+        .from("events")
+        .select("*")
+        .gte("start_date", now.toISOString())
+        .lte("start_date", threeMonthsLater.toISOString())
+        .order("start_date", { ascending: true });
 
       // Nearby Events
-      const { data: nearby, error: nearbyError } = await supabase
-        .from('events')
-        .select('*')
-        .eq('location', userLocation);
+      let nearby = [];
+      if (userLocation) {
+        const { data: nearbyData, error: nearbyError } = await supabase
+          .from("events")
+          .select("*")
+          .not("latitude", "is", null)
+          .not("longitude", "is", null);
 
-      if (trendingError || upcomingError || nearbyError) {
-        throw trendingError || upcomingError || nearbyError;
+        if (nearbyError) throw nearbyError;
+
+        // Filtrer les événements à proximité (par exemple, dans un rayon de 50 km)
+        const RADIUS = 50; // Rayon en kilomètres
+        nearby = nearbyData.filter((event) => {
+          const distance = getDistanceFromLatLonInKm(
+            userLocation.latitude,
+            userLocation.longitude,
+            event.latitude,
+            event.longitude
+          );
+          return distance <= RADIUS;
+        });
+      }
+
+      if (trendingError || upcomingError) {
+        throw trendingError || upcomingError;
       }
 
       // Function to capitalize the first letter
@@ -59,30 +77,62 @@ export const useEvents = (userLocation) => {
       };
 
       // Format the dates
-      const formattedTrending = trending.map(event => ({
+      const formattedTrending = trending.map((event) => ({
         ...event,
-        start_date: capitalizeFirstLetter(format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", { locale: enUS }))
+        start_date: capitalizeFirstLetter(
+          format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", {
+            locale: enUS,
+          })
+        ),
       }));
 
-      const formattedUpcoming = upcoming.map(event => ({
+      const formattedUpcoming = upcoming.map((event) => ({
         ...event,
-        start_date: capitalizeFirstLetter(format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", { locale: enUS }))
+        start_date: capitalizeFirstLetter(
+          format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", {
+            locale: enUS,
+          })
+        ),
       }));
 
-      const formattedNearby = nearby.map(event => ({
+      const formattedNearby = nearby.map((event) => ({
         ...event,
-        start_date: capitalizeFirstLetter(format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", { locale: enUS }))
+        start_date: capitalizeFirstLetter(
+          format(new Date(event.start_date), "EEEE dd MMMM yyyy - HH:mm", {
+            locale: enUS,
+          })
+        ),
       }));
 
       setTrendingEvents(formattedTrending);
       setUpcomingEvents(formattedUpcoming);
       setNearbyEvents(formattedNearby);
     } catch (err) {
-      console.error('Erreur lors de la récupération des événements :', err);
-      setError('Impossible de récupérer les événements.');
+      console.error("Erreur lors de la récupération des événements :", err);
+      setError("Impossible de récupérer les événements.");
     } finally {
       setLoading(false);
     }
+  };
+
+  // Fonction pour calculer la distance entre deux points géographiques
+  const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Rayon de la Terre en kilomètres
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance en kilomètres
+    return distance;
+  };
+
+  const deg2rad = (deg) => {
+    return deg * (Math.PI / 180);
   };
 
   return { trendingEvents, upcomingEvents, nearbyEvents, loading, error };
